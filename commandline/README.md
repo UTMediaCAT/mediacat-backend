@@ -17,7 +17,7 @@ https://github.com/UTMediaCAT/mediacat-twitter-crawler
 https://github.com/UTMediaCAT/mediacat-domain-crawler
 ```
 
-* in the same directory as app.js make sure there is a folder named ```csv```
+* in the same directory as app.js (`mediacat-backend/commandline`) make sure there is a folder named ```csv```
 
 
 ## Execute
@@ -37,7 +37,7 @@ Go to the directory location of the [twitter crawler script](https://github.com/
 3. Go to the `mediacat-domain-crawler` and `mediacat-twitter-crawler` repos and follow any additional instructions that may need to be done. This will probably be more updated frequently.
 
 
-In the app.js file notice the following constants:
+In the app.js file in `mediacat-backend/commandline` notice the following constants:
 
 
 ```
@@ -70,4 +70,4 @@ twittercsvFile
 
 If you wanted to retach from the screen, you can do `screen -r crawl` or to see the number of screens you can do `screen -ls` . 
 
-To learn more [read here](https://linuxize.com/post/how-to-use-linux-screen/)
+To learn more about screens [read here](https://linuxize.com/post/how-to-use-linux-screen/)
