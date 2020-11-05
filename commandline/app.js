@@ -1,95 +1,86 @@
-/**
- * To use this, 
- * npm install first
- * do node app.js
- * Also make sure that the crawlers are install correctly
- * twint has to be on the right branch with pip
- * npm install for the domain crawler
- * needs to have directory ./csv/
- * input the path to the scope parser up top
- * input the path to the scope input csv up top as well
- */
-
-
-/**
- * Step Two: feed to the crawlers
- */
-
-const utf8 = require('utf8'); 
 const fs = require('fs');
 const csvParser = require('csv-parser');
+const childProcess = require('child_process');
 
+const PATH_SCOPE_PARSER='../../mediacat-frontend/scope_parser/main.py';
+const PATH_INPUT_CSV='../../mediacat-frontend/scope_parser/csv/test_demo.csv';
 
+const PATH_TWITTER_CRAWLER='../../mediacat-twitter-crawler/twitter_crawler.py';
+const PATH_DOMAIN_CRAWLER='../../mediacat-domain-crawler/newCrawler/crawl.js';
 
-const PATH_SCOPE_PARSER='../../mediacat-frontend/scope_parser/main.py'
-const PATH_INPUT_CSV='../../mediacat-frontend/scope_parser/csv/test_demo.csv'
+const FAILED_DOMAIN_LINKS='./failed_links_list.json';
+const VALID_DOMAIN_LINKS='./link_title_list.json';
 
-const PATH_TWITTER_CRAWLER='../../mediacat-twitter-crawler/twitter_crawler.py'
-const PATH_DOMAIN_CRAWLER='../../mediacat-domain-crawler/newCrawler/crawl.js'
+const domaincsvFile = './domain.csv';
+const twittercsvFile = './twitter.csv';
 
-
-const FAILED_DOMAIN_LINKS='./failed_links_list.json'
-const VALID_DOMAIN_LINKS='./link_title_list.json'
-
-const domaincsvFile = './domain.csv'
-const twittercsvFile = './twitter.csv'
-
-const childProcess = require("child_process");
-
-
+/**
+ * calls the scope parser, then the two crawlers
+ */
 function app() {
-
-  stepOne(stepTwo)
-
+  stepOne(stepTwo);
 }
 
-function stepTwo() {
-  stepTwoTwitter()
-  stepTwoDomain()
+/**
+ * calls the scope parser, then the twitter crawler
+ */
+function appTwitter() {
+  stepOne(stepTwoTwitter);
 }
+
+/**
+ * calls the scope parser, then the app crawler
+ */
+function appDomain() {
+  stepOne(stepTwoDomain);
+}
+
+/**************************************************/
 
 function stepOne(next) {
   /**
    * Step one: feed in the input files into scope parser
    */
 
-  const pythonProcess = childProcess.spawnSync('python3',[PATH_SCOPE_PARSER, PATH_INPUT_CSV]);
-
-  // pythonProcess.stderr.on('err', (err)=> {
-  //   console.log("error!");
-  //   console.log(err);
-  // });
-
-  // pythonProcess.stdout.on('data', (data) => {
-  //   console.log("finished scope parsing");
-  //   // two files would be generated called domain.csv and twitter.csv
-  // });
-
-  console.log(pythonProcess.stderr.toString())
-  console.log(pythonProcess.stdout.toString())
-
-  next()
+  try {
+    const pythonProcess = childProcess.spawnSync('python3',[PATH_SCOPE_PARSER, PATH_INPUT_CSV]);
+    try {
+      console.log(pythonProcess.stderr.toString())
+      console.log(pythonProcess.stdout.toString())
+    } catch (err) {
+        console.error(err)
+    }
+    next()
+  } catch (err) {
+      console.error(err)
+      process.exit(1);
+    }
 }
 
 /**
  * Step Two: feed to the crawlers
- * fs.open( filename, flags, mode, callback )
+ */
+
+ /**
+ * helper function that calls the two crawlers
+ * is used by stepOne
+ */
+
+function stepTwo() {
+  // twitter crawler
+  stepTwoTwitter()
+
+  // domain crawler
+  stepTwoDomain()
+}
+
+/*******************Twitter*******************************/
+
+/**
+ * calls the twitter crawler
  */
 
 function stepTwoTwitter() {
-
-
-
-
-  try {
-      if (fs.existsSync(domaincsvFile)) {
-        console.log('File %s exists!', domaincsvFile)
-      }
-    } catch(err) {
-      console.error(err)
-  }
-
-
   try {
       if (fs.existsSync(twittercsvFile)) {
           console.log('File %s exists!', twittercsvFile)
@@ -97,6 +88,7 @@ function stepTwoTwitter() {
       }
     } catch(err) {
       console.error(err)
+      process.exit(1);
   }
 
   /**
@@ -104,30 +96,56 @@ function stepTwoTwitter() {
    * install twint on the correct branch version
    * : pip3 install --user --upgrade git+https://github.com/twintproject/twint.git@origin/master#egg=twint
    */
-
-  // const pythonProcess2 = childProcess.spawn('python3',[PATH_TWITTER_CRAWLER, twittercsvFile]);
-  // const pythonProcess3 = childProcess.exec( `python3 ${PATH_TWITTER_CRAWLER} ${twittercsvFile}`, callbackAfterDomainCrawler)
   
-  const pythonProcess2 = childProcess.spawn( `python3 ${PATH_TWITTER_CRAWLER} ${twittercsvFile}`, {
-    shell: true
-  })
+  try {
+      const pythonProcess2 = childProcess.spawn( `python3 ${PATH_TWITTER_CRAWLER} ${twittercsvFile}`, {
+        shell: true
+      })
 
-  pythonProcess2.on('close', () => {
-    callbackAfterTwitterCrawler()
-  })
+      pythonProcess2.on('close', () => {
+        callbackAfterTwitterCrawler()
+      })
+    
+      pythonProcess2.stderr.on('data', function (data) {
+        console.error("STDERR:", data.toString());
+      });
 
-  pythonProcess2.stderr.on('data', function (data) {
-    console.error("STDERR:", data.toString());
-  });
-  pythonProcess2.stdout.on('data', function (data) {
-    console.log("STDOUT:", data.toString());
-  });
-  pythonProcess2.on('exit', function (exitCode) {
-    console.log("Child exited with code: " + exitCode);
-  });
+      pythonProcess2.stdout.on('data', function (data) {
+        console.log("STDOUT:", data.toString());
+      });
 
+      pythonProcess2.on('exit', function (exitCode) {
+        console.log("Child exited with code: " + exitCode);
+      });
+
+  } catch (err) {
+      console.error(err)
+  }
 }
 
+function callbackAfterTwitterCrawler() {
+  console.log("finished crawling twitter")
+  console.log("all twitter csv 's should be ready")
+
+};
+
+/*******************Twitter*******************************/
+
+/*******************Domain*******************************/
+
+function stepTwoDomain() {
+
+  try {
+    if (fs.existsSync(domaincsvFile)) {
+      console.log('File %s exists!', domaincsvFile)
+    }
+  } catch(err) {
+    console.error(err)
+    process.exit(1);
+  }
+
+  readDomainInput(domaincsvFile, callDomainCrawler, callbackAfterDomainCrawler)
+}
 
 /**
  * Read csv of domains and call the domain crawler
@@ -135,16 +153,20 @@ function stepTwoTwitter() {
  */
 function readDomainInput(file, callback, callback2) {
   const results = [];
-  fs.createReadStream(file)
-  .pipe(csvParser())
-  .on('data', (data) => results.push(data))
-  .on('end', () => {
-     return (callback(results, callback2));
-  });
+  try {
+    fs.createReadStream(file)
+    .pipe(csvParser())
+    .on('data', (data) => results.push(data))
+    .on('end', () => {
+      return (callback(results, callback2));
+    });
+  } catch (err) {
+    console.log(err)
+  }
 }
 
-
 /**
+ * calls the domain crawler
  * feed the urls to the domain crawler,
  * make sure to `npm install`
  * @param {*} domainlist 
@@ -162,36 +184,32 @@ function callDomainCrawler(domainlist, callback) {
 
   console.log(list)
   const command = PATH_DOMAIN_CRAWLER
-  const domainCrawlProcess = childProcess.fork(command, list)
 
-  // listen for errors as they may prevent the exit event from firing
-  domainCrawlProcess.on('error', function (err) {
-      console.log(err);
-  });
+  try {
+    const domainCrawlProcess = childProcess.fork(command, list)
 
-  // execute the callback once the process has finished running
-  domainCrawlProcess.on('exit', function (code) {
-      var err = code === 0 ? null : new Error('exit code ' + code);
-      if (err) {
+    // listen for errors as they may prevent the exit event from firing
+    domainCrawlProcess.on('error', function (err) {
         console.log(err);
-      }
-      callback();
-  });
+    });
+
+    // execute the callback once the process has finished running
+    domainCrawlProcess.on('exit', function (code) {
+        var err = code === 0 ? null : new Error('exit code ' + code);
+        if (err) {
+          console.log(err);
+        }
+        callback();
+    });
+  } catch (err) {
+    console.log(err);
+  }
 
 }
-
-function callbackAfterTwitterCrawler() {
-  console.log("finished crawling twitter")
-  console.log("all twitter csv 's should be ready")
-
-};
-
 
 function callbackAfterDomainCrawler() {
   console.log("finished crawling domains")
   console.log("all domain json 's should be ready")
-
-
   console.log("domain crawl is complete")
 
   try {
@@ -201,7 +219,6 @@ function callbackAfterDomainCrawler() {
   } catch(err) {
     console.error(err)
   }
-
 
   try {
       if (fs.existsSync(VALID_DOMAIN_LINKS)) {
@@ -214,9 +231,9 @@ function callbackAfterDomainCrawler() {
 
 };
 
-function stepTwoDomain() {
-  readDomainInput(domaincsvFile, callDomainCrawler, callbackAfterDomainCrawler)
-}
+/*******************Domain*******************************/
+/*******************Post*******************************/
+
 
 /**
  * Take the output of the crawlers and 
@@ -235,16 +252,17 @@ function stepTwoDomain() {
  * Call back to post processing after crawler is done
  * 
  */
-
 function callToPostProcessing(){
   console.log("call to post processing")
-
  }
 
+/*******************Post*******************************/
 
-
-
-
+/**
+ * uncomment commands as needed
+ */
 if (require.main === module) {
-  app();
+  // app();
+  // appDomain();
+  appTwitter();
 }
