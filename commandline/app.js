@@ -262,7 +262,7 @@ function callToPostProcessing(){
  * uncomment commands as needed
  */
 if (require.main === module) {
-  // app();
+  app();
   // appDomain();
-  appTwitter();
+  // appTwitter();
 }
