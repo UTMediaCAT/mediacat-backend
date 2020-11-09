@@ -64,7 +64,10 @@ twittercsvFile
 
 5. run the commmand `screen -S crawl` to get on a screen session
 
-6. run the command `node app.js` in this folder `mediacat-backend/commandline`
+6. run one of the following commands in the folder `mediacat-backend/commandline`:
+ - `node app.js twitter ` to run the twitter crawler
+ - `node app.js domain ` to run the domain crawler
+ - `node app.js` to run everything
 
 7. run the command `control + a + d` to detach from the screen
 
