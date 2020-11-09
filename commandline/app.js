@@ -15,6 +15,30 @@ const domaincsvFile = './domain.csv';
 const twittercsvFile = './twitter.csv';
 
 /**
+ * checks for the correct number of arguments and calles the appropriate function
+ * `node app.js twitter ` to run the twitter crawler
+ * `node app.js domain ` to run the domain crawler
+ * `node app.js` to run everything
+ */
+
+function run() {
+  var myArgs = process.argv.slice(2);    
+  switch (myArgs[0]) {
+  case 'twitter':
+    console.log('twitter crawler initiated...');
+    appTwitter();
+    break;
+  case 'domain':
+    console.log('domain crawler initiated...');
+    appDomain();
+    break;
+  default:
+    console.log('twitter and domain crawler initiated...');
+    app();
+  }
+}
+
+/**
  * calls the scope parser, then the two crawlers
  */
 function app() {
@@ -45,33 +69,33 @@ function stepOne(next) {
   try {
     const pythonProcess = childProcess.spawnSync('python3',[PATH_SCOPE_PARSER, PATH_INPUT_CSV]);
     try {
-      console.log(pythonProcess.stderr.toString())
-      console.log(pythonProcess.stdout.toString())
+      console.log(pythonProcess.stderr.toString());
+      console.log(pythonProcess.stdout.toString());
     } catch (err) {
-        console.error(err)
+      console.error(err);
     }
-    next()
+    next();
   } catch (err) {
-      console.error(err)
-      process.exit(1);
-    }
+    console.error(err);
+    process.exit(1);
+  }
 }
 
 /**
  * Step Two: feed to the crawlers
  */
 
- /**
+/**
  * helper function that calls the two crawlers
  * is used by stepOne
  */
 
 function stepTwo() {
   // twitter crawler
-  stepTwoTwitter()
+  stepTwoTwitter();
 
   // domain crawler
-  stepTwoDomain()
+  stepTwoDomain();
 }
 
 /*******************Twitter*******************************/
@@ -82,13 +106,13 @@ function stepTwo() {
 
 function stepTwoTwitter() {
   try {
-      if (fs.existsSync(twittercsvFile)) {
-          console.log('File %s exists!', twittercsvFile)
-        //file exists
-      }
-    } catch(err) {
-      console.error(err)
-      process.exit(1);
+    if (fs.existsSync(twittercsvFile)) {
+      console.log('File %s exists!', twittercsvFile);
+      //file exists
+    }
+  } catch(err) {
+    console.error(err);
+    process.exit(1);
   }
 
   /**
@@ -98,36 +122,36 @@ function stepTwoTwitter() {
    */
   
   try {
-      const pythonProcess2 = childProcess.spawn( `python3 ${PATH_TWITTER_CRAWLER} ${twittercsvFile}`, {
-        shell: true
-      })
+    const pythonProcess2 = childProcess.spawn( `python3 ${PATH_TWITTER_CRAWLER} ${twittercsvFile}`, {
+      shell: true
+    });
 
-      pythonProcess2.on('close', () => {
-        callbackAfterTwitterCrawler()
-      })
-    
-      pythonProcess2.stderr.on('data', function (data) {
-        console.error("STDERR:", data.toString());
-      });
+    pythonProcess2.on('close', () => {
+      callbackAfterTwitterCrawler();
+    });
+  
+    pythonProcess2.stderr.on('data', function (data) {
+      console.error('STDERR:', data.toString());
+    });
 
-      pythonProcess2.stdout.on('data', function (data) {
-        console.log("STDOUT:", data.toString());
-      });
+    pythonProcess2.stdout.on('data', function (data) {
+      console.log('STDOUT:', data.toString());
+    });
 
-      pythonProcess2.on('exit', function (exitCode) {
-        console.log("Child exited with code: " + exitCode);
-      });
+    pythonProcess2.on('exit', function (exitCode) {
+      console.log('Child exited with code: ' + exitCode);
+    });
 
   } catch (err) {
-      console.error(err)
+    console.error(err);
   }
 }
 
 function callbackAfterTwitterCrawler() {
-  console.log("finished crawling twitter")
-  console.log("all twitter csv 's should be ready")
+  console.log('finished crawling twitter');
+  console.log('all twitter csvs should be ready');
 
-};
+}
 
 /*******************Twitter*******************************/
 
@@ -137,14 +161,14 @@ function stepTwoDomain() {
 
   try {
     if (fs.existsSync(domaincsvFile)) {
-      console.log('File %s exists!', domaincsvFile)
+      console.log('File %s exists!', domaincsvFile);
     }
   } catch(err) {
-    console.error(err)
+    console.error(err);
     process.exit(1);
   }
 
-  readDomainInput(domaincsvFile, callDomainCrawler, callbackAfterDomainCrawler)
+  readDomainInput(domaincsvFile, callDomainCrawler, callbackAfterDomainCrawler);
 }
 
 /**
@@ -155,13 +179,13 @@ function readDomainInput(file, callback, callback2) {
   const results = [];
   try {
     fs.createReadStream(file)
-    .pipe(csvParser())
-    .on('data', (data) => results.push(data))
-    .on('end', () => {
-      return (callback(results, callback2));
-    });
+      .pipe(csvParser())
+      .on('data', (data) => results.push(data))
+      .on('end', () => {
+        return (callback(results, callback2));
+      });
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
 }
 
@@ -175,31 +199,31 @@ function readDomainInput(file, callback, callback2) {
 function callDomainCrawler(domainlist, callback) {
   //let crawler = require(PATH_DOMAIN_CRAWLER)
   let i;
-  let list = ['-l']
+  let list = ['-l'];
   for (i = 0; i < domainlist.length; i++) {
     let domain = domainlist[i];
-    let source = domain.Source
-    list.push(source)
+    let source = domain.Source;
+    list.push(source);
   }
 
-  console.log(list)
-  const command = PATH_DOMAIN_CRAWLER
+  console.log(list);
+  const command = PATH_DOMAIN_CRAWLER;
 
   try {
-    const domainCrawlProcess = childProcess.fork(command, list)
+    const domainCrawlProcess = childProcess.fork(command, list);
 
     // listen for errors as they may prevent the exit event from firing
     domainCrawlProcess.on('error', function (err) {
-        console.log(err);
+      console.log(err);
     });
 
     // execute the callback once the process has finished running
     domainCrawlProcess.on('exit', function (code) {
-        var err = code === 0 ? null : new Error('exit code ' + code);
-        if (err) {
-          console.log(err);
-        }
-        callback();
+      var err = code === 0 ? null : new Error('exit code ' + code);
+      if (err) {
+        console.log(err);
+      }
+      callback();
     });
   } catch (err) {
     console.log(err);
@@ -208,28 +232,28 @@ function callDomainCrawler(domainlist, callback) {
 }
 
 function callbackAfterDomainCrawler() {
-  console.log("finished crawling domains")
-  console.log("all domain json 's should be ready")
-  console.log("domain crawl is complete")
+  console.log('finished crawling domains');
+  console.log('all domain jsons should be ready');
+  console.log('domain crawl is complete');
 
   try {
     if (fs.existsSync(FAILED_DOMAIN_LINKS)) {
-       console.log('File %s exists!', FAILED_DOMAIN_LINKS)
+      console.log('File %s exists!', FAILED_DOMAIN_LINKS);
     }
   } catch(err) {
-    console.error(err)
+    console.error(err);
   }
 
   try {
-      if (fs.existsSync(VALID_DOMAIN_LINKS)) {
-          console.log('File %s exists!', VALID_DOMAIN_LINKS)
-        //file exists
-      }
-    } catch(err) {
-      console.error(err)
+    if (fs.existsSync(VALID_DOMAIN_LINKS)) {
+      console.log('File %s exists!', VALID_DOMAIN_LINKS);
+      //file exists
+    }
+  } catch(err) {
+    console.error(err);
   }
 
-};
+}
 
 /*******************Domain*******************************/
 /*******************Post*******************************/
@@ -253,8 +277,8 @@ function callbackAfterDomainCrawler() {
  * 
  */
 function callToPostProcessing(){
-  console.log("call to post processing")
- }
+  console.log('call to post processing');
+}
 
 /*******************Post*******************************/
 
@@ -262,7 +286,8 @@ function callToPostProcessing(){
  * uncomment commands as needed
  */
 if (require.main === module) {
-  app();
+  run();
+  // app();
   // appDomain();
   // appTwitter();
 }
