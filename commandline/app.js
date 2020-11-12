@@ -2,17 +2,19 @@ const fs = require('fs');
 const csvParser = require('csv-parser');
 const childProcess = require('child_process');
 
-const PATH_SCOPE_PARSER='../../mediacat-frontend/scope_parser/main.py';
-const PATH_INPUT_CSV='../../mediacat-frontend/scope_parser/csv/test_demo.csv';
+const PATH_SCOPE_PARSER = process.env.COMMANDLINE_PATH_SCOPE_PARSER || '../../mediacat-frontend/scope_parser/main.py';
+const PATH_INPUT_CSV = process.env.COMMANDLINE_PATH_SCOPE_PARSER || '../../mediacat-frontend/scope_parser/csv/test_demo.csv';
 
-const PATH_TWITTER_CRAWLER='../../mediacat-twitter-crawler/twitter_crawler.py';
-const PATH_DOMAIN_CRAWLER='../../mediacat-domain-crawler/newCrawler/crawl.js';
+const PATH_TWITTER_CRAWLER= process.env.COMMANDLINE_PATH_TWITTER_CRAWLER || '../../mediacat-twitter-crawler/twitter_crawler.py';
+const PATH_DOMAIN_CRAWLER= process.env.COMMANDLINE_PATH_DOMAIN_CRAWLER || '../../mediacat-domain-crawler/newCrawler/crawl.js';
 
-const FAILED_DOMAIN_LINKS='./failed_links_list.json';
-const VALID_DOMAIN_LINKS='./link_title_list.json';
+const FAILED_DOMAIN_LINKS= process.env.COMMANDLINE_FAILED_DOMAIN_LINKS || './failed_links_list.json';
+const VALID_DOMAIN_LINKS= process.env.COMMANDLINE_VALID_DOMAIN_LINKS || './link_title_list.json';
 
-const domaincsvFile = './domain.csv';
-const twittercsvFile = './twitter.csv';
+const domaincsvFile = process.env.COMMANDLINE_domaincsvFile || './domain.csv';
+const twittercsvFile = process.env.COMMANDLINE_twittercsvFile || './twitter.csv';
+
+require('dotenv').config();
 
 /**
  * checks for the correct number of arguments and calles the appropriate function

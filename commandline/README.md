@@ -37,18 +37,21 @@ Go to the directory location of the [twitter crawler script](https://github.com/
 3. Go to the `mediacat-domain-crawler` and `mediacat-twitter-crawler` repos and follow any additional instructions that may need to be done. This will probably be more updated frequently.
 
 
-In the app.js file in `mediacat-backend/commandline` notice the following constants:
+In the file `.env` in `mediacat-backend/commandline` notice the following constants and set appropriately:
+
+
+( Note you can also set the same contants in the `app.js` file in `mediacat-backend/commandline` )
 
 
 ```
-PATH_SCOPE_PARSER
-PATH_INPUT_CSV
-PATH_TWITTER_CRAWLER
-PATH_DOMAIN_CRAWLER
-FAILED_DOMAIN_LINKS
-VALID_DOMAIN_LINKS
-domaincsvFile
-twittercsvFile
+COMMANDLINE_PATH_SCOPE_PARSER
+COMMANDLINE_PATH_INPUT_CSV
+COMMANDLINE_PATH_TWITTER_CRAWLER
+COMMANDLINE_PATH_DOMAIN_CRAWLER
+COMMANDLINE_FAILED_DOMAIN_LINKS
+COMMANDLINE_VALID_DOMAIN_LINKS
+COMMANDLINE_domaincsvFile
+COMMANDLINE_twittercsvFile
 ```
 
 - `PATH_SCOPE_PARSER` set to the path of the script that calls the main parser
