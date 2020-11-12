@@ -1,9 +1,10 @@
 const fs = require('fs');
 const csvParser = require('csv-parser');
 const childProcess = require('child_process');
+require('dotenv').config();
 
 const PATH_SCOPE_PARSER = process.env.COMMANDLINE_PATH_SCOPE_PARSER || '../../mediacat-frontend/scope_parser/main.py';
-const PATH_INPUT_CSV = process.env.COMMANDLINE_PATH_SCOPE_PARSER || '../../mediacat-frontend/scope_parser/csv/test_demo.csv';
+const PATH_INPUT_CSV = process.env.COMMANDLINE_PATH_INPUT_CSV || '../../mediacat-frontend/scope_parser/csv/test_demo.csv';
 
 const PATH_TWITTER_CRAWLER= process.env.COMMANDLINE_PATH_TWITTER_CRAWLER || '../../mediacat-twitter-crawler/twitter_crawler.py';
 const PATH_DOMAIN_CRAWLER= process.env.COMMANDLINE_PATH_DOMAIN_CRAWLER || '../../mediacat-domain-crawler/newCrawler/crawl.js';
@@ -13,8 +14,6 @@ const VALID_DOMAIN_LINKS= process.env.COMMANDLINE_VALID_DOMAIN_LINKS || './link_
 
 const domaincsvFile = process.env.COMMANDLINE_domaincsvFile || './domain.csv';
 const twittercsvFile = process.env.COMMANDLINE_twittercsvFile || './twitter.csv';
-
-require('dotenv').config();
 
 /**
  * checks for the correct number of arguments and calles the appropriate function
@@ -69,14 +68,33 @@ function stepOne(next) {
    */
 
   try {
-    const pythonProcess = childProcess.spawnSync('python3',[PATH_SCOPE_PARSER, PATH_INPUT_CSV]);
-    try {
-      console.log(pythonProcess.stderr.toString());
-      console.log(pythonProcess.stdout.toString());
-    } catch (err) {
-      console.error(err);
-    }
-    next();
+    const pythonProcess = childProcess.spawn('python3',[PATH_SCOPE_PARSER, PATH_INPUT_CSV], {
+      shell: true
+    });
+
+    pythonProcess.on('close', () => {
+      next();
+    });
+  
+    pythonProcess.stderr.on('data', function (data) {
+      console.error('STDERR:', data.toString());
+      process.exit(1);
+    });
+
+    pythonProcess.stdout.on('data', function (data) {
+      console.log('STDOUT:', data.toString());
+    });
+
+    pythonProcess.on('exit', function (exitCode, signalCode) {
+      if (exitCode) {
+        console.error('Child exited with code', exitCode);
+      } else if (signalCode) {
+        console.error('Child was killed with signal', signalCode);
+      } else {
+        console.log('Child exited with code: ' + exitCode);
+      }
+    });
+
   } catch (err) {
     console.error(err);
     process.exit(1);
