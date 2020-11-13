@@ -52,6 +52,7 @@ COMMANDLINE_FAILED_DOMAIN_LINKS
 COMMANDLINE_VALID_DOMAIN_LINKS
 COMMANDLINE_domaincsvFile
 COMMANDLINE_twittercsvFile
+COMMANDLINE_metadataJSON
 ```
 
 - `PATH_SCOPE_PARSER` set to the path of the script that calls the main parser
@@ -62,6 +63,8 @@ COMMANDLINE_twittercsvFile
 - `VALID_DOMAIN_LINKS` set to the path of the valid links outputted by the domain crawler
 - `domaincsvFile` set to the path of the domain csv outputted by the scope parser
 - `twittercsvFile` set to the path of the twitter csv outputted by the scope parser
+- `metadataJSON` set to the path of the output from metascraper
+
 
 4. run the command `npm install` in this folder `mediacat-backend/commandline`
 

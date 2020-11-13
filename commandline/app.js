@@ -1,6 +1,7 @@
 const fs = require('fs');
 const csvParser = require('csv-parser');
 const childProcess = require('child_process');
+const getMetadata = require('../../mediacat-domain-crawler/newCrawler/getDates');
 require('dotenv').config();
 
 const PATH_SCOPE_PARSER = process.env.COMMANDLINE_PATH_SCOPE_PARSER || '../../mediacat-frontend/scope_parser/main.py';
@@ -14,6 +15,8 @@ const VALID_DOMAIN_LINKS= process.env.COMMANDLINE_VALID_DOMAIN_LINKS || './link_
 
 const domaincsvFile = process.env.COMMANDLINE_domaincsvFile || './domain.csv';
 const twittercsvFile = process.env.COMMANDLINE_twittercsvFile || './twitter.csv';
+
+const metadataJSON = process.env.COMMANDLINE_metadataJSON || './metadata_modified_list.json';
 
 /**
  * checks for the correct number of arguments and calles the appropriate function
@@ -273,6 +276,8 @@ function callbackAfterDomainCrawler() {
     console.error(err);
   }
 
+  callToMetascraper();
+
 }
 
 /*******************Domain*******************************/
@@ -283,6 +288,21 @@ function callbackAfterDomainCrawler() {
  * Take the output of the crawlers and 
  * stuff it into date processor
  */
+
+async function callToMetascraper(){
+  await getMetadata.getDate(VALID_DOMAIN_LINKS);
+  console.log('metascraping is complete!');
+
+  try {
+    if (fs.existsSync(metadataJSON)) {
+      console.log('File %s exists!', metadataJSON);
+    }
+    callToPostProcessing();
+  } catch(err) {
+    console.error(err);
+  }
+
+}
 
 
 /**
@@ -297,7 +317,7 @@ function callbackAfterDomainCrawler() {
  * 
  */
 function callToPostProcessing(){
-  console.log('call to post processing');
+  console.log('call to post processing...');
 }
 
 /*******************Post*******************************/
