@@ -13,11 +13,15 @@ def load_json(file):
 def load_twitter_csv(file):
     data = {}
     #format: {url: data}
-    with open(file) as csv_file:
+    with open(file, mode='r', encoding='utf-8-sig') as csv_file:
         for line in csv.DictReader(csv_file): 
+            print(line)
             # parse string as a list
-            urls = line['Found URL'][2:-2]
-            lst = list(urls.split("', '")) 
+            try:
+                urls = line['Found URL'][2:-2]
+                lst = list(urls.split("', '")) 
+            except(TypeError):
+                lst = None
 
             data[line['URL to article/Tweet']] = {'url': line['URL to article/Tweet'], 'id': line['Hit Record Unique ID'], 'Source': line['Source'], 
             'Location': line['Location'], 'Name': line['Name'], 'Hit Type': line['Hit Type'], 'Tags': line['Passed through tags'], 
