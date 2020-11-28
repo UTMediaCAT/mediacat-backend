@@ -20,14 +20,19 @@ def load_json():
 """Loads the twitter output csv into a dictionary"""
 def load_twitter_csv(file):
     data = {}
-    #format: {url: data}
-    with open(file) as csv_file:
-        for line in csv.DictReader(csv_file):   
-            lst = ast.literal_eval(line['Found URL'])
-            hashtags= ast.literal_eval(line['Hashtags'])
-            mentions = ast.literal_eval(line['Mentions'])
 
-            data[line['URL to article/Tweet']] = {'url': line['URL to article/Tweet'], 'id': int(line['Hit Record Unique ID']), 'domain': line['Source'], 
+    with open(file, mode='r', encoding='utf-8-sig') as csv_file:
+        for line in csv.DictReader(csv_file): 
+            try:
+                lst = ast.literal_eval(line['Found URL'])
+                hashtags= ast.literal_eval(line['Hashtags'])
+                mentions = ast.literal_eval(line['Mentions']) 
+            except(TypeError):
+                # TODO: Log this error properly!
+                print("Type Error")
+                lst, hashtags, mentions = None, None, None
+
+            data[line['URL to article/Tweet']] = {'url': line['URL to article/Tweet'], 'id': line['Hit Record Unique ID'], 'domain': line['Source'], 
             'Location': line['Location'], 'Name': line['Name'], 'Hit Type': line['Hit Type'], 'Tags': line['Passed through tags'], 
             'Associated Publisher' : line['Associated Publisher'], 'author_metadata': line['Authors'], 'article_text': line['Plain Text of Article or Tweet'],
             'date': line['Date'], 'Mentions': mentions, 'Hashtags': hashtags, 'found_urls': lst}
@@ -142,7 +147,6 @@ Parameters:
     interest_output: the of interest dictionary of articles not in the scope
 """
 def process_domain(data, scope):
-    id = 1
     referrals = {}
     for node in data:
         found_aliases, twitter_handles = find_aliases(data, node, scope)
