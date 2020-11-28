@@ -1,0 +1,52 @@
+{
+    "title":"WarnerMedia News & Sports Privacy Policy-  First",
+    "url":"https://www.aljazeera.com/second_url",
+    "author_metadata":null,
+    "date":"",
+    "html_content":"",
+    "article_text":"some other text here",
+    "article_len":46651,
+    "domain":"https://www.aljazeera.com/",
+    "found_urls":[
+        {
+            "title":" Live play",
+            "url":"https://www.aljazeera.com/live"
+        },
+        {
+            "title":"News",
+            "url":"https://www.aljazeera.com/news/"
+        },
+        {
+            "title":"Middle East",
+            "url":"https://www.aljazeera.com/middle-east/"
+        },
+        {
+            "title":"Africa",
+            "url":"https://www.aljazeera.com/africa/"
+        },
+        {
+            "title":"Asia",
+            "url":"https://www.aljazeera.com/asia/"
+        },
+        {
+            "title":"US & Canada",
+            "url":"https://www.aljazeera.com/us-canada/"
+        },
+        {
+            "title":"Latin America",
+            "url":"https://www.aljazeera.com/latin-america/"
+        },
+        {
+            "title":"Europe",
+            "url":"https://www.aljazeera.com/europe/"
+        },
+        {
+            "title":"Asia Pacific",
+            "url":"https://www.aljazeera.com/asia-pacific/"
+        },
+        {
+            "title":"US Elections",
+            "url":"https://www.aljazeera.com/us-elections-2020/"
+        }
+    ]
+}

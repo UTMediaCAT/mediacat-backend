@@ -1,33 +1,42 @@
-import json
+import json, os
 import re
 import csv 
-
+import ast
 """Loads the domain output json into a dictionary"""
-def load_json(file):
-    # used to parse domain output file
-    with open(file) as f:
-        data = json.load(f)
-    return data
+def load_json():
+    # used to parse domain files in a folder called results
+    path_to_json = './Results/'
+    all_data = {}
+    for file_name in [file for file in os.listdir(path_to_json) if file.endswith('.json')]:
+        with open(path_to_json + file_name) as json_file:
+            data = json.load(json_file)
+            data['id'] = os.path.splitext(file_name)[0]
+            all_data[data['url']] = data
+    json_object = json.dumps(all_data, indent = 4)  
+    with open("sample_minis.json", "w") as outfile: 
+        outfile.write(json_object) 
+    return all_data
 
 """Loads the twitter output csv into a dictionary"""
 def load_twitter_csv(file):
     data = {}
     #format: {url: data}
     with open(file) as csv_file:
-        for line in csv.DictReader(csv_file): 
-            # parse string as a list
-            urls = line['Found URL'][2:-2]
-            lst = list(urls.split("', '")) 
+        for line in csv.DictReader(csv_file):   
+            lst = ast.literal_eval(line['Found URL'])
+            hashtags= ast.literal_eval(line['Hashtags'])
+            mentions = ast.literal_eval(line['Mentions'])
 
-            data[line['URL to article/Tweet']] = {'url': line['URL to article/Tweet'], 'id': line['Hit Record Unique ID'], 'Source': line['Source'], 
+            data[line['URL to article/Tweet']] = {'url': line['URL to article/Tweet'], 'id': int(line['Hit Record Unique ID']), 'domain': line['Source'], 
             'Location': line['Location'], 'Name': line['Name'], 'Hit Type': line['Hit Type'], 'Tags': line['Passed through tags'], 
-            'Associated Publisher' : line['Associated Publisher'], 'Authors': line['Authors'], 'article_text': line['Plain Text of Article or Tweet'],
-            'Date': line['Date'], 'Mentions': line['Mentions'], 'Hashtags': line['Hashtags'], 'found_urls': lst}
+            'Associated Publisher' : line['Associated Publisher'], 'author_metadata': line['Authors'], 'article_text': line['Plain Text of Article or Tweet'],
+            'date': line['Date'], 'Mentions': mentions, 'Hashtags': hashtags, 'found_urls': lst}
     json_object = json.dumps(data, indent = 4)  
 
     # Writing to sample_twitter.json (just to visualize the twitter dictionary)
     with open("sample_twitter.json", "w") as outfile: 
         outfile.write(json_object) 
+    
     return data 
 
 """Loads the scope csv into a dictionary."""
@@ -37,10 +46,25 @@ def load_scope(file):
     #format: {source: {aliases: [], twitter_handles:[]}}
     with open(file) as csv_file:
         for line in csv.DictReader(csv_file): 
-            # TODO: Find expected out put to chan together the list of aliases
-            aliases = line['Text Aliases'].split('|')
-            twitter = line['Associated Twitter Handle'].split('|')
-            scope[line['Source']] = {'aliases': aliases, 'twitter_handles': twitter}
+            aliases,twitter,tags = [], [], []
+            if line['Text Aliases'] != " " and line['Text Aliases']:
+                aliases = line['Text Aliases'].split('|')
+            if line['Associated Twitter Handle'] != " " and line['Associated Twitter Handle']:
+                twitter = line['Associated Twitter Handle'].split('|')
+            if line['Tags'] != " " and line['Tags']:
+                tags = line['Tags'].split('|')
+            scope[line['Source']] = {'Name': line['Name'],
+                                    'RSS': line['RSS feed URLs (where available)'],
+                                    'Type': line['Type'],
+                                    'Publisher': line['Associated Publisher'],
+                                    'Tags': tags,
+                                    'aliases': aliases, 
+                                    'twitter_handles': twitter}
+    json_object = json.dumps(scope, indent = 4)  
+
+    # Writing to sample_twitter.json (just to visualize the twitter dictionary)
+    with open("scope.json", "w") as outfile: 
+        outfile.write(json_object) 
     return scope 
 
 """
@@ -63,7 +87,11 @@ def find_aliases(data, node, scope):
     twitters = []
     sequence = data[node]['article_text']
     for source, info in scope.items():
-        aliases = info['aliases'] + info['twitter_handles'] + [source]
+        aliases = [source]
+        if info['aliases']:
+            aliases += info['aliases'] 
+        if info['twitter_handles']:
+            aliases += info['twitter_handles']
         pattern = r"(\W|^)(%s)(\W|$)" % "|".join(aliases)
         if re.search(pattern, sequence, re.IGNORECASE):
             found_aliases.append(source)
@@ -74,7 +102,6 @@ def find_aliases(data, node, scope):
     t = [item for item in twitters if item not in found_aliases]
     random_tweets = [item for item in t if item not in scope.keys()]
     print(found_aliases)
-    # print(random_tweets)
     return found_aliases, random_tweets
 
 """
@@ -86,38 +113,24 @@ Parameters:
     output: the output dictionary to add to 
     interest_output: the of interest dictionary of articles not in the scope
 """
-def process_twitter(data, scope, output, interest_output):
+def process_twitter(data, scope):
     print('NOW PROCESSING TWITTER!')
+    referrals = {}
     for node in data:
         found_aliases, twitter_handles = find_aliases(data, node, scope)
-        links = {}
         # each key in links is an article url, and it has a list of article ids that are talking about it
         for link in data[node]['found_urls']:
-            
-            # if this article is already in output dictionary, then append this node's id
-            if link[0] in output:
-                output[link[0]]['referring record id'].append(id)
-            else: 
-                # otherwise save all future links/referrals in links, 
-                # where the key is each link in 'found_urls' and the value is this node
-                if link[0] in links:
-                    links[link[0]].append(id)
-                else:
-                    links[link[0]] = [id] 
-        
-                referrals = []
-        # get all referrals for this url (who is referring to me)
-        if data[node]['url'] in links:
-            referrals = links[data[node]['url']]
-
-        output[node] = {'id': data[node]['id'], 'url':data[node]['url'], 'source': data[node]['url'], 
-                        'name': '', 'tags':[], 'publisher':'', 'referring record id':referrals, 
-                        'authors': '', 
-                        'plain text':data[node]['article_text'], 
-                        'date of publication':'', 
-                        'image reference':'', 
-                        'anchor text':'', 
-                        'language':''}
+            if link in referrals:
+                referrals[link].append(data[node]['id'])
+            else:
+                referrals[link] = [data[node]['id']] 
+        # looks for sources in found aliases, and adds it to the linking
+        for source in found_aliases:
+            if source in referrals:
+                referrals[source].append(data[node]['id'])
+            else:
+                referrals[source] = [data[node]['id']] 
+    return referrals
 
 """
 Processes the domain data by finding all the articles that are referring to it
@@ -128,62 +141,78 @@ Parameters:
     output: the output dictionary to add to 
     interest_output: the of interest dictionary of articles not in the scope
 """
-def process_domain(data, scope, output, interest_output):
+def process_domain(data, scope):
     id = 1
-    inScope = True
+    referrals = {}
     for node in data:
-        # TODO: Check against scope data to find articles not in the scope
-        # if not data[node]['url'] in scope.keys():
-        #     inScope = False
-
-        # found_urls in data are the articles that this node is talking about 
-        # 'referring record id' is which records are referring to this? aka who is talking about me
-
-        # TODO: Take found_aliases and complete matching on the correct nodes
         found_aliases, twitter_handles = find_aliases(data, node, scope)
-        links = {}
         # each key in links is an article url, and it has a list of article ids that are talking about it
         for link in data[node]['found_urls']:
-            
-            # if this article is already in output dictionary, then append this node's id
-            if link[0] in output:
-                output[link[0]]['referring record id'].append(id)
-            else: 
-                # otherwise save all future links/referrals in links, 
-                # where the key is each link in 'found_urls' and the value is this node
-                if link[0] in links:
-                    links[link[0]].append(id)
-                else:
-                    links[link[0]] = [id] 
+            # save all referrals where the key is each link in 'found_urls' and the value is this article's id
+            if link['url'] in referrals:
+                referrals[link['url']].append(data[node]['id'])
+            else:
+                referrals[link['url']] = [data[node]['id']] 
 
         # looks for sources in found aliases, and adds it to the linking
         for source in found_aliases:
-            if source in links:
-                links[source].append(id)
+            if source in referrals:
+                referrals[source].append(data[node]['id'])
             else:
-                links[source] = [id] 
+                referrals[source] = [data[node]['id']] 
+        
+    return referrals
 
-        referrals = []
-        # get all referrals for this url (who is referring to me)
-        if data[node]['url'] in links:
-            referrals += links[data[node]['url']]
-        # get all referrals for this domain (by text alias or twitter handle)
-        # TODO: Bug: always has itself as a referring
-        # TODO: Bug: articles found earlier were not properly matched (for domain)
-        if data[node]['domain'] in links:
-            referrals += links[data[node]['domain']]
-        if inScope:
-            output[node] = {'id': id, 'url':data[node]['url'], 'source': data[node]['url'], 
-                        'name': '', 'tags':[], 'publisher':'', 'referring record id':referrals, 
-                        'authors': data[node]['author_metadata'], 
-                        'plain text':data[node]['article_text'], 
-                        'date of publication':data[node]['date'], 
-                        'image reference':'', 
-                        'anchor text':'', 
-                        'language':''}
-        else: 
-            interest_output[node] = {}
-        id+=1
+def create_output(article, referrals, scope, output, interest_output):
+    
+    if article["domain"] in scope.keys():
+        output[article['id']] = {'id': article['id'], 
+                    'url':article['url'], 
+                    'source': article['url'], 
+                    'name': scope[article["domain"]]['Name'], 
+                    'tags':scope[article["domain"]]['Tags'], 
+                    'publisher':scope[article["domain"]]['Publisher'], 
+                    'referring record id':referrals, 
+                    'authors': article['author_metadata'], 
+                    'plain text':article['article_text'], 
+                    'date of publication':article['date'], 
+                    'image reference':'', 
+                    'anchor text':'', 
+                    'language':''}
+    else: 
+        interest_output[article['id']] = {'id': article['id'], 'url':article['url'], 'source': article['url'], 
+                    'name': '', 'tags':[], 'publisher':'', 'referring record id':referrals, 
+                    'authors': article['author_metadata'], 
+                    'plain text':article['article_text'], 
+                    'date of publication':article['date'], 
+                    'image reference':'', 
+                    'anchor text':'', 
+                    'language':''}
+        print(interest_output)
+
+def parse_referrals(article, domain_referrals, twitter_referrals):
+
+    referring_articles = []
+    # get all referrals for this url (who is referring to me)
+    if article['url'] in domain_referrals:
+        referring_articles += domain_referrals[article['url']]
+    
+    # get all referrals for this domain (by text alias or twitter handle)
+    if article['domain'] in domain_referrals:
+        referring_articles += domain_referrals[article['domain']]
+    
+    if str(article['url']) in twitter_referrals:
+        referring_articles += twitter_referrals[str(article['url'])]
+
+    # get all referrals for this domain (by text alias or twitter handle)
+    if article['domain'] in twitter_referrals:
+        referring_articles += twitter_referrals[article['domain']]
+
+    # remove duplicates from list
+    referring_articles = list(dict.fromkeys(referring_articles))
+    # remove itself from list
+    if article['id'] in referring_articles: referring_articles.remove(article['id'])
+    return referring_articles
 
 """
 The main point of entry for the processor. Calls the domain and twitter 
@@ -198,9 +227,16 @@ Outputs the post processing data into output.json
 def process_crawler(domain_data, twitter_data, scope):
     output = {}
     interest_output = {}
-    process_domain(domain_data, scope, output, interest_output)
-    process_twitter(twitter_data, scope, output, interest_output)
+    domain_referrals = process_domain(domain_data, scope)
+    twitter_referrals = process_twitter(twitter_data, scope)
     
+    for node in domain_data:
+        referring_articles = parse_referrals(domain_data[node], domain_referrals, twitter_referrals)
+        create_output(domain_data[node], referring_articles, scope, output, interest_output)
+    for node in twitter_data:
+        referring_articles = parse_referrals(twitter_data[node], domain_referrals, twitter_referrals)
+        create_output(twitter_data[node], referring_articles, scope, output, interest_output)
+       
     # Serializing json    
     json_object = json.dumps(output, indent = 4)  
 
@@ -208,7 +244,14 @@ def process_crawler(domain_data, twitter_data, scope):
     with open("output.json", "w") as outfile: 
         outfile.write(json_object) 
 
-scope = load_scope('./scope.csv')
+    # Serializing json    
+    json_object = json.dumps(interest_output, indent = 4)  
+
+    # Writing to output.json 
+    with open("interest_output.json", "w") as outfile: 
+        outfile.write(json_object) 
+
+scope = load_scope('./input_scope_final.csv')
 twitter_data = load_twitter_csv('./twitter_output.csv')
-domain_data = load_json('./domain_output.json')
+domain_data = load_json()
 process_crawler(domain_data, twitter_data, scope)

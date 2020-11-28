@@ -1,0 +1,20 @@
+{
+    "title":"WarnerMedia News & Sports Privacy Policy - Second",
+    "url":"https://www.aljazeera.com/",
+    "author_metadata":null,
+    "date":"",
+    "html_content":"",
+    "article_text":"text here",
+    "article_len":46651,
+    "domain":"https://www.aljazeera.com/",
+    "found_urls":[
+        {
+            "title":" Live play",
+            "url":"https://www.aljazeera.com/live"
+        },
+        {
+            "title":"News",
+            "url":"https://www.aljazeera.com/news/"
+        }
+    ]
+}
