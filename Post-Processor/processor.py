@@ -22,16 +22,15 @@ def load_twitter_csv(file):
     data = {}
 
     with open(file, mode='r', encoding='utf-8-sig') as csv_file:
-        for line in csv.DictReader(csv_file): 
-            try:
+        for line in csv.DictReader(csv_file):
+            if not(line['Found URL'] and line['Hashtags'] and line['Mentions']):
+                print(line)
+                continue
+            else:
                 lst = ast.literal_eval(line['Found URL'])
-                hashtags= ast.literal_eval(line['Hashtags'])
+                hashtags = ast.literal_eval(line['Hashtags'])
                 mentions = ast.literal_eval(line['Mentions']) 
-            except(TypeError):
-                # TODO: Log this error properly!
-                print("Type Error")
-                lst, hashtags, mentions = None, None, None
-
+           
             data[line['URL to article/Tweet']] = {'url': line['URL to article/Tweet'], 'id': line['Hit Record Unique ID'], 'domain': line['Source'], 
             'Location': line['Location'], 'Name': line['Name'], 'Hit Type': line['Hit Type'], 'Tags': line['Passed through tags'], 
             'Associated Publisher' : line['Associated Publisher'], 'author_metadata': line['Authors'], 'article_text': line['Plain Text of Article or Tweet'],
@@ -138,8 +137,8 @@ def process_twitter(data, scope):
     return referrals
 
 """
-Processes the domain data by finding all the articles that are referring to it
-and mutating the output dictionary. 
+Processes the domain data by finding all the articles that it is referring to and 
+articles that are referring to it and mutating the output dictionary. 
 Parameters: 
     data: the domain output dictionary
     scope: the scope dictionary
@@ -166,7 +165,9 @@ def process_domain(data, scope):
                 referrals[source] = [data[node]['id']] 
         
     return referrals
-
+"""
+Creates the data format for the output json
+"""
 def create_output(article, referrals, scope, output, interest_output):
     
     if article["domain"] in scope.keys():
@@ -193,7 +194,14 @@ def create_output(article, referrals, scope, output, interest_output):
                     'anchor text':'', 
                     'language':''}
         print(interest_output)
-
+"""
+Cross-match the referrals for domain referrals and twitter referrals.
+Returns a list of all sources that are referring to this specific article.
+Params:
+    article: an article in the data
+    domain_referrals: a dictionary of all the referrals in the domain data
+    twitter_referrals: a dictionary of all the referrals in the twitter data
+"""
 def parse_referrals(article, domain_referrals, twitter_referrals):
 
     referring_articles = []
@@ -205,6 +213,7 @@ def parse_referrals(article, domain_referrals, twitter_referrals):
     if article['domain'] in domain_referrals:
         referring_articles += domain_referrals[article['domain']]
     
+    # get all referrals for this url (who is referring to me)
     if str(article['url']) in twitter_referrals:
         referring_articles += twitter_referrals[str(article['url'])]
 
@@ -231,9 +240,11 @@ Outputs the post processing data into output.json
 def process_crawler(domain_data, twitter_data, scope):
     output = {}
     interest_output = {}
+    # get a dictionary of all the referrals for each source
     domain_referrals = process_domain(domain_data, scope)
     twitter_referrals = process_twitter(twitter_data, scope)
     
+    # cross match between domain and twitter data and creat the output dictionary
     for node in domain_data:
         referring_articles = parse_referrals(domain_data[node], domain_referrals, twitter_referrals)
         create_output(domain_data[node], referring_articles, scope, output, interest_output)
@@ -256,6 +267,6 @@ def process_crawler(domain_data, twitter_data, scope):
         outfile.write(json_object) 
 
 scope = load_scope('./input_scope_final.csv')
-twitter_data = load_twitter_csv('./twitter_output.csv')
+twitter_data = load_twitter_csv('./final.csv')
 domain_data = load_json()
 process_crawler(domain_data, twitter_data, scope)
