@@ -55,7 +55,7 @@ def mini_processor(name, tag):
                                 "Mentions": tweet["mentions"].tolist(),
                                 "Hashtags": tweet["hashtags"].tolist(),
                                 "Found URL": tweet["urls"].tolist()})
-        retweet.to_csv("mini/" + name + '.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)  # nopep8
+        retweet.to_csv("mini/" + name + '.csv', index=False, encoding='utf-8-sig', quoting=csv.QUOTE_NONNUMERIC)  # nopep8
     except(Exception):
         pass
 
