@@ -18,23 +18,24 @@ def load_json():
     return all_data
 
 """Loads the twitter output csv into a dictionary"""
-def load_twitter_csv(file):
+def load_twitter_csv():
     data = {}
-
-    with open(file, mode='r', encoding='utf-8-sig') as csv_file:
-        for line in csv.DictReader(csv_file):
-            if not(line['Found URL'] and line['Hashtags'] and line['Mentions']):
-                print(line)
-                continue
-            else:
-                lst = ast.literal_eval(line['Found URL'])
-                hashtags = ast.literal_eval(line['Hashtags'])
-                mentions = ast.literal_eval(line['Mentions']) 
-           
-            data[line['URL to article/Tweet']] = {'url': line['URL to article/Tweet'], 'id': line['Hit Record Unique ID'], 'domain': line['Source'], 
-            'Location': line['Location'], 'Name': line['Name'], 'Hit Type': line['Hit Type'], 'Tags': line['Passed through tags'], 
-            'Associated Publisher' : line['Associated Publisher'], 'author_metadata': line['Authors'], 'article_text': line['Plain Text of Article or Tweet'],
-            'date': line['Date'], 'Mentions': mentions, 'Hashtags': hashtags, 'found_urls': lst}
+    path = './TwitterOutput/'
+    for file_name in [file for file in os.listdir(path) if file.endswith('.csv')]:
+        with open(path + file_name, mode='r', encoding='utf-8-sig') as csv_file:
+            for line in csv.DictReader(csv_file):
+                if not(line['Found URL'] and line['Hashtags'] and line['Mentions']):
+                    print(line)
+                    continue
+                else:
+                    lst = ast.literal_eval(line['Found URL'])
+                    hashtags = ast.literal_eval(line['Hashtags'])
+                    mentions = ast.literal_eval(line['Mentions']) 
+            
+                data[line['URL to article/Tweet']] = {'url': line['URL to article/Tweet'], 'id': line['Hit Record Unique ID'], 'domain': line['Source'], 
+                'Location': line['Location'], 'Hit Type': line['Hit Type'], 'Tags': line['Passed through tags'], 
+                'Associated Publisher' : line['Associated Publisher'], 'author_metadata': line['Authors'], 'article_text': line['Plain Text of Article or Tweet'],
+                'date': line['Date'], 'Mentions': mentions, 'Hashtags': hashtags, 'found_urls': lst}
     json_object = json.dumps(data, indent = 4)  
 
     # Writing to sample_twitter.json (just to visualize the twitter dictionary)
@@ -267,6 +268,6 @@ def process_crawler(domain_data, twitter_data, scope):
         outfile.write(json_object) 
 
 scope = load_scope('./input_scope_final.csv')
-twitter_data = load_twitter_csv('./final.csv')
+twitter_data = load_twitter_csv()
 domain_data = load_json()
 process_crawler(domain_data, twitter_data, scope)
