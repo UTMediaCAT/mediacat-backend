@@ -5,6 +5,7 @@ import ast
 """Loads the domain output json into a dictionary"""
 def load_json():
     # used to parse domain files in a folder called results
+    print("Loading domain files")
     path_to_json = './Results/'
     all_data = {}
     for file_name in [file for file in os.listdir(path_to_json) if file.endswith('.json')]:
@@ -12,13 +13,11 @@ def load_json():
             data = json.load(json_file)
             data['id'] = os.path.splitext(file_name)[0]
             all_data[data['url']] = data
-    json_object = json.dumps(all_data, indent = 4)  
-    with open("sample_minis.json", "w") as outfile: 
-        outfile.write(json_object) 
     return all_data
 
 """Loads the twitter output csv into a dictionary"""
 def load_twitter_csv():
+    print("Loading twitter files")
     data = {}
     path = './TwitterOutput/'
     for file_name in [file for file in os.listdir(path) if file.endswith('.csv')]:
@@ -36,16 +35,11 @@ def load_twitter_csv():
                 'Location': line['Location'], 'Hit Type': line['Hit Type'], 'Tags': line['Passed through tags'], 
                 'Associated Publisher' : line['Associated Publisher'], 'author_metadata': line['Authors'], 'article_text': line['Plain Text of Article or Tweet'],
                 'date': line['Date'], 'Mentions': mentions, 'Hashtags': hashtags, 'found_urls': lst}
-    json_object = json.dumps(data, indent = 4)  
-
-    # Writing to sample_twitter.json (just to visualize the twitter dictionary)
-    with open("sample_twitter.json", "w") as outfile: 
-        outfile.write(json_object) 
-    
     return data 
 
 """Loads the scope csv into a dictionary."""
 def load_scope(file):
+    print("Loading scope")
     # parse all the text aliases from each source using the scope file
     scope = {}
     #format: {source: {aliases: [], twitter_handles:[]}}
@@ -64,12 +58,7 @@ def load_scope(file):
                                     'Publisher': line['Associated Publisher'],
                                     'Tags': tags,
                                     'aliases': aliases, 
-                                    'twitter_handles': twitter}
-    json_object = json.dumps(scope, indent = 4)  
-
-    # Writing to sample_twitter.json (just to visualize the twitter dictionary)
-    with open("scope.json", "w") as outfile: 
-        outfile.write(json_object) 
+                                    'twitter_handles': twitter} 
     return scope 
 
 """
@@ -106,7 +95,6 @@ def find_aliases(data, node, scope):
     # check these twitter handles arent in the scope
     t = [item for item in twitters if item not in found_aliases]
     random_tweets = [item for item in t if item not in scope.keys()]
-    print(found_aliases)
     return found_aliases, random_tweets
 
 """
@@ -119,8 +107,10 @@ Parameters:
     interest_output: the of interest dictionary of articles not in the scope
 """
 def process_twitter(data, scope):
-    print('NOW PROCESSING TWITTER!')
+    print("Processing Twitter")
     referrals = {}
+    num_processed = 0
+    number_of_articles = len(data)
     for node in data:
         found_aliases, twitter_handles = find_aliases(data, node, scope)
         # each key in links is an article url, and it has a list of article ids that are talking about it
@@ -134,7 +124,11 @@ def process_twitter(data, scope):
             if source in referrals:
                 referrals[source].append(data[node]['id'])
             else:
-                referrals[source] = [data[node]['id']] 
+                referrals[source] = [data[node]['id']]
+        num_processed += 1
+        print("Processed "+ str(num_processed)+ "/"+ str(number_of_articles)+ " twitter articles")
+
+    print("Finished processing twitter")
     return referrals
 
 """
@@ -147,7 +141,10 @@ Parameters:
     interest_output: the of interest dictionary of articles not in the scope
 """
 def process_domain(data, scope):
+    print("Processing Domain")
     referrals = {}
+    num_processed = 0
+    number_of_articles = len(data)
     for node in data:
         found_aliases, twitter_handles = find_aliases(data, node, scope)
         # each key in links is an article url, and it has a list of article ids that are talking about it
@@ -163,8 +160,10 @@ def process_domain(data, scope):
             if source in referrals:
                 referrals[source].append(data[node]['id'])
             else:
-                referrals[source] = [data[node]['id']] 
-        
+                referrals[source] = [data[node]['id']]
+        num_processed += 1
+        print("Processed "+ str(num_processed)+ "/"+ str(number_of_articles)+ " domain articles")
+    print("Finished Processing Domain")
     return referrals
 """
 Creates the data format for the output json
@@ -246,13 +245,16 @@ def process_crawler(domain_data, twitter_data, scope):
     twitter_referrals = process_twitter(twitter_data, scope)
     
     # cross match between domain and twitter data and creat the output dictionary
+    print("Parsing domain output file")
     for node in domain_data:
         referring_articles = parse_referrals(domain_data[node], domain_referrals, twitter_referrals)
         create_output(domain_data[node], referring_articles, scope, output, interest_output)
+    print("Parsing twitter output file")
     for node in twitter_data:
         referring_articles = parse_referrals(twitter_data[node], domain_referrals, twitter_referrals)
         create_output(twitter_data[node], referring_articles, scope, output, interest_output)
-       
+    
+    print("Serializing and writing final json output")
     # Serializing json    
     json_object = json.dumps(output, indent = 4)  
 
