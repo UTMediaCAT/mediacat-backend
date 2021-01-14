@@ -2,23 +2,27 @@ import json, os
 import re
 import csv 
 import ast
+import itertools
 """Loads the domain output json into a dictionary"""
 def load_json():
     # used to parse domain files in a folder called results
     print("Loading domain files")
     path_to_json = './Results/'
     all_data = {}
+    pairings = {}
     for file_name in [file for file in os.listdir(path_to_json) if file.endswith('.json')]:
         with open(path_to_json + file_name) as json_file:
             data = json.load(json_file)
             data['id'] = os.path.splitext(file_name)[0]
             all_data[data['url']] = data
-    return all_data
+            pairings[data['id']] = {'url': data['url'], 'domain': data['domain']}
+    return all_data, pairings
 
 """Loads the twitter output csv into a dictionary"""
 def load_twitter_csv():
     print("Loading twitter files")
     data = {}
+    pairings = {}
     path = './TwitterOutput/'
     for file_name in [file for file in os.listdir(path) if file.endswith('.csv')]:
         with open(path + file_name, mode='r', encoding='utf-8-sig') as csv_file:
@@ -30,12 +34,12 @@ def load_twitter_csv():
                     lst = ast.literal_eval(line['Found URL'])
                     hashtags = ast.literal_eval(line['Hashtags'])
                     mentions = ast.literal_eval(line['Mentions']) 
-            
+                pairings[line['Hit Record Unique ID']] = {'url': line['URL to article/Tweet'], 'domain': line['Source']}
                 data[line['URL to article/Tweet']] = {'url': line['URL to article/Tweet'], 'id': line['Hit Record Unique ID'], 'domain': line['Source'], 
                 'Location': line['Location'], 'Hit Type': line['Hit Type'], 'Tags': line['Passed through tags'], 
                 'Associated Publisher' : line['Associated Publisher'], 'author_metadata': line['Authors'], 'article_text': line['Plain Text of Article or Tweet'],
                 'date': line['Date'], 'Mentions': mentions, 'Hashtags': hashtags, 'found_urls': lst}
-    return data 
+    return data, pairings
 
 """Loads the scope csv into a dictionary."""
 def load_scope(file):
@@ -168,7 +172,7 @@ def process_domain(data, scope):
 """
 Creates the data format for the output json
 """
-def create_output(article, referrals, scope, output, interest_output):
+def create_output(article, referrals, scope, output, interest_output, domain_pairs, twitter_pairs):
     
     if article["domain"] in scope.keys():
         output[article['id']] = {'id': article['id'], 
@@ -185,15 +189,28 @@ def create_output(article, referrals, scope, output, interest_output):
                     'anchor text':'', 
                     'language':''}
     else: 
-        interest_output[article['id']] = {'id': article['id'], 'url':article['url'], 'source': article['url'], 
+        cited = {}
+        for ref_id in referrals:
+            if ref_id in domain_pairs:
+                try:
+                    cited[domain_pairs[ref_id]['domain']] += 1
+                except:
+                    cited[domain_pairs[ref_id]['domain']] =1
+            else:
+                try:
+                    cited[twitter_pairs[ref_id]['domain']] += 1
+                except:
+                    cited[twitter_pairs[ref_id]['domain']] =1
+        # sort top referring domains by number of hits descending
+        top = dict(sorted(cited.items(), key=lambda item: item[1], reverse=True))
+        
+        interest_output[article['id']] = {'id': article['id'], 'hit count': len(referrals), 'url':article['url'], 'source': article['url'], 
                     'name': '', 'tags':[], 'publisher':'', 'referring record id':referrals, 
                     'authors': article['author_metadata'], 
                     'plain text':article['article_text'], 
                     'date of publication':article['date'], 
-                    'image reference':'', 
-                    'anchor text':'', 
-                    'language':''}
-        print(interest_output)
+                    'top referrals': dict(itertools.islice(top.items(), 5))} 
+                    # top referrals gets the top 5 domains that referred to this article the most
 """
 Cross-match the referrals for domain referrals and twitter referrals.
 Returns a list of all sources that are referring to this specific article.
@@ -237,7 +254,7 @@ Parameters:
 
 Outputs the post processing data into output.json
 """
-def process_crawler(domain_data, twitter_data, scope):
+def process_crawler(domain_data, twitter_data, scope, domain_pairs, twitter_pairs):
     output = {}
     interest_output = {}
     # get a dictionary of all the referrals for each source
@@ -248,11 +265,11 @@ def process_crawler(domain_data, twitter_data, scope):
     print("Parsing domain output file")
     for node in domain_data:
         referring_articles = parse_referrals(domain_data[node], domain_referrals, twitter_referrals)
-        create_output(domain_data[node], referring_articles, scope, output, interest_output)
+        create_output(domain_data[node], referring_articles, scope, output, interest_output, domain_pairs, twitter_pairs)
     print("Parsing twitter output file")
     for node in twitter_data:
         referring_articles = parse_referrals(twitter_data[node], domain_referrals, twitter_referrals)
-        create_output(twitter_data[node], referring_articles, scope, output, interest_output)
+        create_output(twitter_data[node], referring_articles, scope, output, interest_output, domain_pairs, twitter_pairs)
     
     print("Serializing and writing final json output")
     # Serializing json    
@@ -262,6 +279,8 @@ def process_crawler(domain_data, twitter_data, scope):
     with open("output.json", "w") as outfile: 
         outfile.write(json_object) 
 
+    # Sorts interest output 
+    interest_output = dict(sorted(interest_output.items(), key=lambda item: item[1]['hit count'], reverse=True))
     # Serializing json    
     json_object = json.dumps(interest_output, indent = 4)  
 
@@ -270,6 +289,6 @@ def process_crawler(domain_data, twitter_data, scope):
         outfile.write(json_object) 
 
 scope = load_scope('./input_scope_final.csv')
-twitter_data = load_twitter_csv()
-domain_data = load_json()
-process_crawler(domain_data, twitter_data, scope)
+twitter_data, twitter_pairs = load_twitter_csv()
+domain_data, domain_pairs = load_json()
+process_crawler(domain_data, twitter_data, scope, domain_pairs, twitter_pairs)
