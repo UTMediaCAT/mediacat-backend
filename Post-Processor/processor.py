@@ -3,6 +3,8 @@ import re
 import csv 
 import ast
 import itertools
+from timeit import default_timer as timer
+
 """Loads the domain output json into a dictionary"""
 def load_json():
     # used to parse domain files in a folder called results
@@ -112,6 +114,7 @@ Parameters:
 """
 def process_twitter(data, scope):
     print("Processing Twitter")
+    start = timer()
     referrals = {}
     num_processed = 0
     number_of_articles = len(data)
@@ -131,8 +134,8 @@ def process_twitter(data, scope):
                 referrals[source] = [data[node]['id']]
         num_processed += 1
         print("Processed "+ str(num_processed)+ "/"+ str(number_of_articles)+ " twitter articles")
-
-    print("Finished processing twitter")
+    end = timer()
+    print("Finished processing twitter - Took " + str(end - start) + " seconds")
     return referrals
 
 """
@@ -146,6 +149,7 @@ Parameters:
 """
 def process_domain(data, scope):
     print("Processing Domain")
+    start = timer()
     referrals = {}
     num_processed = 0
     number_of_articles = len(data)
@@ -167,7 +171,8 @@ def process_domain(data, scope):
                 referrals[source] = [data[node]['id']]
         num_processed += 1
         print("Processed "+ str(num_processed)+ "/"+ str(number_of_articles)+ " domain articles")
-    print("Finished Processing Domain")
+    end = timer()
+    print("Finished Processing Domain - Took " + str(end - start) + " seconds")
     return referrals
 """
 Creates the data format for the output json
@@ -262,16 +267,20 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs, twitter_pair
     twitter_referrals = process_twitter(twitter_data, scope)
     
     # cross match between domain and twitter data and creat the output dictionary
-    print("Parsing domain output file")
+    start = timer()
     for node in domain_data:
         referring_articles = parse_referrals(domain_data[node], domain_referrals, twitter_referrals)
         create_output(domain_data[node], referring_articles, scope, output, interest_output, domain_pairs, twitter_pairs)
-    print("Parsing twitter output file")
+    end = timer()
+    print("Parsing domain output file - Took " + str(end - start) + " seconds")
+    start = timer()
     for node in twitter_data:
         referring_articles = parse_referrals(twitter_data[node], domain_referrals, twitter_referrals)
         create_output(twitter_data[node], referring_articles, scope, output, interest_output, domain_pairs, twitter_pairs)
-    
-    print("Serializing and writing final json output")
+    end = timer()
+    print("Parsing twitter output file - Took " + str(end - start) + " seconds")
+    print("Output "+ str(len(output)) + " articles in scope and "+ str(len(interest_output)) + " articles in interest scope")
+    start = timer()
     # Serializing json    
     json_object = json.dumps(output, indent = 4)  
 
@@ -287,8 +296,25 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs, twitter_pair
     # Writing to output.json 
     with open("interest_output.json", "w") as outfile: 
         outfile.write(json_object) 
+    end = timer()
+    print("Serializing and writing final json output - Took " + str(end - start) + " seconds")
 
+
+
+start = timer()
+scope_timer = timer()
 scope = load_scope('./input_scope_final.csv')
+scope_timer_end = timer()
+
+twitter_timer = timer()
 twitter_data, twitter_pairs = load_twitter_csv()
+twitter_timer_end = timer()
+domain_timer = timer()
 domain_data, domain_pairs = load_json()
+domain_timer_end = timer()
 process_crawler(domain_data, twitter_data, scope, domain_pairs, twitter_pairs)
+end = timer()
+print("Time to run whole post-processor took " + str(end - start) + " seconds") # Time in seconds
+print("Time to read scope took " + str(scope_timer_end - scope_timer) + " seconds") # Time in seconds
+print("Time to read twitter files took " + str(twitter_timer_end - twitter_timer) + " seconds") # Time in seconds
+print("Time to read domain files took " + str(domain_timer_end - domain_timer) + " seconds") # Time in seconds
