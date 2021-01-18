@@ -192,7 +192,8 @@ def create_output(article, referrals, scope, output, interest_output, domain_pai
                     'date of publication':article['date'], 
                     'image reference':'', 
                     'anchor text':'', 
-                    'language':''}
+                    'language':'',
+                    'number of referrals': len(referrals)}
     else: 
         cited = {}
         for ref_id in referrals:
