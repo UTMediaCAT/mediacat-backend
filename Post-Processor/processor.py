@@ -87,6 +87,8 @@ def find_aliases(data, node, scope):
     twitters = []
     sequence = data[node]['article_text']
     for source, info in scope.items():
+        if data[node]['domain'] == source:
+            continue
         aliases = [source]
         if info['aliases']:
             aliases += info['aliases'] 
@@ -182,7 +184,7 @@ def create_output(article, referrals, scope, output, interest_output, domain_pai
     if article["domain"] in scope.keys():
         output[article['id']] = {'id': article['id'], 
                     'url':article['url'], 
-                    'source': article['url'], 
+                    'source': article['domain'], 
                     'name': scope[article["domain"]]['Name'], 
                     'tags':scope[article["domain"]]['Tags'], 
                     'publisher':scope[article["domain"]]['Publisher'], 
@@ -210,7 +212,7 @@ def create_output(article, referrals, scope, output, interest_output, domain_pai
         # sort top referring domains by number of hits descending
         top = dict(sorted(cited.items(), key=lambda item: item[1], reverse=True))
         
-        interest_output[article['id']] = {'id': article['id'], 'hit count': len(referrals), 'url':article['url'], 'source': article['url'], 
+        interest_output[article['id']] = {'id': article['id'], 'hit count': len(referrals), 'url':article['url'], 'source': article['domain'], 
                     'name': '', 'tags':[], 'publisher':'', 'referring record id':referrals, 
                     'authors': article['author_metadata'], 
                     'plain text':article['article_text'], 
