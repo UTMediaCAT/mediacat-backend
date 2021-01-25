@@ -115,7 +115,7 @@ https://derstandard.at,Der Standard,,News Source,@derStandardat,Der Standard,,Re
 https://www.deseretnews.com,Deseret News,,News Source,@DeseretNews,Deseret News,,right-center|Referring|International|NAmerica
 https://www.desiringgod.org/,Desiring God,,News Source,@desiringGod,Desiring God,,Referring|Christian|NAmerica
 https://www.detroitnews.com,Detroit News,,News Source,@detroitnews,Detroit News,,Referring|International|NAmerica
-https://www.dpa.com/,Deutsche Presse-Agentur,,news Source,@dpa,Deutsche Presse-Agentur,,Referring|Wire|Europe
+https://www.dpa.com/,Deutsche Presse-Agentur,,News Source,@dpa,Deutsche Presse-Agentur,,Referring|Wire|Europe
 https://diepresse.com,Die Presse,,News Source,@DiePressecom,Die Presse,,Referring|International|Europe
 http://www.taz.de,Die Tageszeitung,,News Source,,Die Tageszeitung,,Referring|International|Europe
 https://dissidentvoice.org,Dissident Voice,,News Source,@DissidentVoice_,Dissident Voice,,Referring|International|NAmerica
@@ -130,7 +130,7 @@ https://edmontonjournal.com,Edmonton Journal,,News Source,@edmontonjournal,Edmon
 http://www.edmontonsun.com,Edmonton Sun,,News Source,@Edmontonsun,Edmonton Sun,,Referring|International|NAmerica
 https://www.efcatoday.org,EFCA Today,,News Source,,EFCA Today,,Referring|Christian|NAmerica
 https://www.efe.com/,EFE,,News Source,@EFEnoticias,EFE,,Referring|International|Europe
-https://www.egyptindependent.com,Egypt Independent,,news Source,@EgyIndependent,Egypt Independent,,Referring|International|MENA
+https://www.egyptindependent.com,Egypt Independent,,News Source,@EgyIndependent,Egypt Independent,,Referring|International|MENA
 https://www.ed.nl,Eindhovens Dagblad,,News Source,@ED_Regio,Eindhovens Dagblad,,Referring|International|Europe
 https://www.elcolombiano.com,El Colombiano,,News Source,@elcolombiano,El Colombiano,,Referring|International|LAmerica
 https://www.elcorreo.com,El Correo,,News Source,@elcorreo_com,El Correo,,Referring|International|Europe
@@ -144,7 +144,7 @@ https://www.elperiodico.com,El Periodico,,News Source,@elperiodico,El Periodico,
 http://elsiglo.com.pa,El Siglo,,News Source,@elsiglodigital,El Siglo,,Referring|International|LAmerica
 https://www.elwatan.com,El Watan,,News Source,@elwatancom,El Watan,,Referring|International|MENA
 http://electronicintifada.net,Electronic Intifada,,News Source,@intifada,Electronic Intifada,,Referring|International|NAmerica
-www.elsevierweekblad.nl,Elsevier Weekblad,,News Source,@ewmagazinenl,Elsevier Weekblad,,Referring|International|Europe
+http://www.elsevierweekblad.nl,Elsevier Weekblad,,News Source,@ewmagazinenl,Elsevier Weekblad,,Referring|International|Europe
 http://www.wam.ae,Emirates News Agency,,News Source,@WAMNEWS_ENG,Emirates News Agency,,Referring|Wire|MENA
 https://www.enlacejudio.com,Enlace Judio,,News Source,@enlacejudio,Enlace Judio,,Referring|Jewish|NAmerica
 https://epoca.globo.com,Época,,News Source,@RevistaEpoca,Época,,Referring|International|LAmerica
@@ -159,9 +159,9 @@ https://www.famigliacristiana.it,Famiglia Cristiana,,News Source,@fam_cristiana,
 http://www.farsnews.ir,FARS news agency,,News Source,@EnglishFars,FARS news agency,,Referring|Wire|MENA
 http://www.fananews.com,Federation of Arab News Agencies,,News Source,,Federation of Arab News Agencies,,Referring|Wire|MENA
 https://www.ft.com,Financial Times,,News Source,@FT,Financial Times, ,center|Referring|International|Europe
-www.focus.de,Focus,,News Source,@focusonline,Focus,,Referring|International|Europe
+http://www.focus.de,Focus,,News Source,@focusonline,Focus,,Referring|International|Europe
 https://www.focusonthefamily.com,Focus on the Family,,News Source,@FocusFamily,Focus on the Family,,Referring|Christian|NAmerica
-www.fokus.se,Fokus,,News Source,@FokusRedaktion,Fokus,,Referring|International|Europe
+https://www.fokus.se,Fokus,,News Source,@FokusRedaktion,Fokus,,Referring|International|Europe
 https://www.folha.uol.com.br,Folha de Sao Paulo,,News Source,@folha,Folha de Sao Paulo,,Referring|International|LAmerica
 http://www.foxnews.com,Fox News,,News Source,@FoxNews,Fox News,,right-center|Referring|International|NAmerica
 https://www.fr.de,Frankfurter Rundschau,,News Source,@FRlokal,Frankfurter Rundschau,,Referring|International|Europe
@@ -175,7 +175,7 @@ https://www.guelphmercury.com,Guelph Mercury,,News Source,@MercuryTribune,Guelph
 https://www.gulf-insider.com,Gulf Insider,,News Source,@GulfInsider,Gulf Insider,,Referring|International|NAmerica
 https://gulfnews.com,Gulf News,,News Source,@gulf_news,Gulf News,,Referring|International|MENA
 https://www.gulf-times.com/,Gulf Times,,News Source,@GulfTimes_Qatar,Gulf Times,,Referring|International|MENA
-https://www.gulftoday.ae/,Gulf Today,,news Source,@gulftoday,Gulf Today,,Referring|International|MENA
+https://www.gulftoday.ae/,Gulf Today,,News Source,@gulftoday,Gulf Today,,Referring|International|MENA
 http://www.haarlemsdagblad.nl,Haarlems Dagblaad,,News Source,@hdhaarlem,Haarlems Dagblaad,,Referring|International|Europe
 https://www.abendblatt.de,Hamburger Addenblatt,,News Source,,Hamburger Addenblatt,,Referring|International|Europe
 https://www.hawaiitribune-herald.com,Hawaii Tribune Herald,,News Source,@HITribuneHerald,Hawaii Tribune Herald,,Referring|International|NAmerica
@@ -193,7 +193,7 @@ https://ilmanifesto.it,Il Manifesto,,News Source,@manifestoglobal,Il Manifesto,,
 https://www.ilrestodelcarlino.it,Il Resto del Carlino,,News Source,@qn_carlino,Il Resto del Carlino,,Referring|International|Europe
 https://www.is.fi,Ilta-Sanomat,,News Source,@iltasanomat,Ilta-Sanomat,,Referring|International|Europe
 https://ijr.com,Independent Journal Review,,News Source,@TheIJR,Independent Journal Review,,right-center|Referring|International|NAmerica
-indiatoday.in,India Today,,News Source,@IndiaToday,India Today,,Referring|International|Asia
+https://indiatoday.in,India Today,,News Source,@IndiaToday,India Today,,Referring|International|Asia
 http://www.ians.in,Indo-Asian News Service,,News Source,@ians_india,Indo-Asian News Service,,Referring|International|Asia
 https://www.indystar.com,IndyStar,,News Source,@indystar,IndyStar,,Referring|International|NAmerica
 https://www.juancole.com,Informed Comment,,News Source,@infcomment,Informed Comment,,Referring|International|NAmerica
@@ -209,7 +209,7 @@ https://www.islamicfinancenews.com,Islamic Finance News,,News Source,@IFN_news,I
 https://irna.ir,Islamic Republic News Agency,,News Source,@IrnaEnglish,Islamic Republic News Agency,,Referring|Wire|MENA
 http://www.israelfaxx.com,Israel Faxx,,News Source,,Israel Faxx,,Referring|Jewish|NAmerica
 https://news.israelinfo.co.il,Israel Info,,News Source,@News_Israelinfo,Israel Info,,Referring|Jewish|MENA
-Istoe.com.br,Istoé,,News Source,@RevistaISTOE,Istoé,,Referring|International|LAmerica
+https://Istoe.com.br,Istoé,,News Source,@RevistaISTOE,Istoé,,Referring|International|LAmerica
 https://www.islamicity.org,Iviews,,News Source,@IslamiCity,Iviews,,Referring|International|NAmerica
 http://www.jwire.com.au/,J-Wire Digital,,News Source,,J-Wire Digital,,Referring|Jewish|Oceania
 http://jacobinmag.com,Jacobin Mag,,News Source,@jacobinmag,Jacobin Mag, ,left|Referring|International|NAmerica
@@ -235,14 +235,14 @@ https://kashmirobserver.net,Kashmir Observer,,News Source,@kashmirobserver,Kashm
 https://www.kauppalehti.fi,Kauppalehti,,News Source,@KauppalehtiFi,Kauppalehti,,Referring|International|Europe
 https://www.khaleejtimes.com,Khaleej Times,,News Source,@khaleejtimes,Khaleej Times,,Referring|International|MENA
 http://www.koreatimes.co.kr,Korea Times,,News Source,@koreatimes,Korea Times,,Referring|International|Asia
-korrespondent.net/magazine/,Korrespondent,,News Source,@Korrespondent,Korrespondent,,Referring|International|Europe
+https://korrespondent.net/magazine/,Korrespondent,,News Source,@Korrespondent,Korrespondent,,Referring|International|Europe
 https://kouvolansanomat.fi,Kouvolan Sanomat,,News Source,@KouvolanSanomat,Kouvolan Sanomat,,Referring|International|Europe
 https://www.kuna.net.kw,Kuwait News Agency,,News Source,@kuna_en,Kuwait News Agency,,Referring|Wire|MENA
-www.lactualite.com,L'actualité,,News Source,@Lactualite,L'actualité,,Referring|International|NAmerica
-espresso.repubblica.it,L'Espresso,,News Source,@espressonline,L'Espresso,,Referring|International|Europe
-lexpress.fr,L'Express,,News Source,@LEXPRESS,L'Express,,Referring|International|Europe
+https://www.lactualite.com,L'actualité,,News Source,@Lactualite,L'actualité,,Referring|International|NAmerica
+https://espresso.repubblica.it,L'Espresso,,News Source,@espressonline,L'Espresso,,Referring|International|Europe
+https://lexpress.fr,L'Express,,News Source,@LEXPRESS,L'Express,,Referring|International|Europe
 https://www.lexpressiondz.com,L'expression,,News Source,@Lexpressiondz,L'expression,,Referring|International|MENA
-nouvelobs.com,L'Obs,,News Source,@lobs,L'Obs,,Referring|International|Europe
+https://nouvelobs.com,L'Obs,,News Source,@lobs,L'Obs,,Referring|International|Europe
 https://www.lorientlejour.com,L'Orient le Jour,,News Source,@LOrientLeJour,L'Orient le Jour,,Referring|International|MENA
 http://www.estrellavalpo.cl,La Estrella,,News Source,"@hdadlaestrella
 ",La Estrella,,Referring|International|LAmerica
@@ -275,9 +275,9 @@ https://www.lana-news.ly/,Libyan News Agency,,News Source,,Libyan News Agency,,R
 https://www.lidovky.cz,Lidovky,,News Source,@lidovky,Lidovky,,Referring|International|Europe
 https://journalstar.com,Lincoln Journal Star,,News Source,@JournalStarNews,Lincoln Journal Star,,Referring|International|NAmerica
 https://www.lusa.pt,Lusa,,News Source,@Lusa_noticias,Lusa,,Referring|International|Europe
-www.macleans.ca,Maclean's,,News Source,@macleans,Maclean's,,Referring|International|NAmerica
+https://www.macleans.ca,Maclean's,,News Source,@macleans,Maclean's,,Referring|International|NAmerica
 http://www.map.ma/,Maghreb Arab Presse,,News Source,@MAP_Information,Maghreb Arab Presse,,Referring|Wire|MENA
-https://mb.com.ph,Manilla Bulletin,,News Source,@manilabulletin,Manilla Bulletin,,Referring|International|Asia
+https://www.mb.com.ph,Manilla Bulletin,,News Source,@manilabulletin,Manilla Bulletin,,Referring|International|Asia
 https://mediamonitors.net/,Media Monitors Network (MMN),,News Source,@2MMN,Media Monitors Network (MMN),,Referring|International|NAmerica
 https://www.mehrnews.com,Mehr News Agency,,News Source,@MehrnewsCom,Mehr News Agency,,Referring|International|MENA
 https://menafn.com,Mena Report,,News Source,@MENAFN,Mena Report,,Referring|International|MENA
@@ -291,7 +291,7 @@ https://www.mingpao.com,Ming Pao,,News Source,@mingpaocom,Ming Pao,,Referring|In
 http://www.mishpacha.com/,Mishpacha Jewish Family Weekly,,News Source,@themishpacha,Mishpacha Jewish Family Weekly,,Referring|Jewish|MENA
 https://www.sunherald.com,Missouri Sun Herald,,News Source,@sunherald,Missouri Sun Herald,,Referring|International|NAmerica
 https://www.mistnews.com,Mist News,,News Source,,Mist News,,Referring|International|MENA
-www.mladina.si,Mladina,,News Source,@SpletnaMladina,Mladina,,Referring|International|Europe
+https://www.mladina.si,Mladina,,News Source,@SpletnaMladina,Mladina,,Referring|International|Europe
 http://mondoweiss.net,Mondoweiss,,News Source,@Mondoweiss,Mondoweiss,,Referring|International|NAmerica
 https://www.montgomeryadvertiser.com,Montgomery Advertiser,,News Source,@MGMAdvertiser,Montgomery Advertiser,,Referring|International|NAmerica
 https://montrealgazette.com,Montreal Gazette,,News Source,@mtlgazette,Montreal Gazette,,Referring|International|NAmerica
@@ -306,26 +306,26 @@ https://muscatdaily.com/,Muscat Daily,,News Source,@Muscat_Daily,Muscat Daily,,R
 https://www.nae.net/news/,National Association of Evangelicals,,News Source,@NAEvangelicals,National Association of Evangelicals,,Referring|International|NAmerica
 https://ninanews.com/website,National Iraqi News Agency,,News Source,@NewsAgencyIQ,National Iraqi News Agency,,Referring|International|MENA
 http://nna-leb.gov.lb/en,National News Agency Lebanon,,News Source,@NNALeb,National News Agency Lebanon,,Referring|Wire|MENA
-nationalreview.com,National Review,,News Source,@NRO,National Review,,Referring|International|NAmerica
+https://nationalreview.com,National Review,,News Source,@NRO,National Review,,Referring|International|NAmerica
 https://www.nbcnews.com/,NBC News,,News Source,@NBCNews,NBC News,,left-center|Referring|International|NAmerica
-www.nedeljnik.rs,Nedeljnik,,News Source,@nedeljnik,Nedeljnik,,Referring|International|Europe
+https://www.nedeljnik.rs,Nedeljnik,,News Source,@nedeljnik,Nedeljnik,,Referring|International|Europe
 https://www.nzz.ch,Neue Zurcher Zeitung,,News Source,@NZZ,Neue Zurcher Zeitung,,Referring|International|Europe
 https://www.nhregister.com,New Haven Register,,News Source,@nhregister,New Haven Register,,Referring|International|NAmerica
 https://www.njherald.com,New Jersey Herald,,News Source,@NJHerald,New Jersey Herald,,Referring|International|NAmerica
 https://njjewishnews.timesofisrael.com/,New Jersey Jewish News,,News Source,@NJJN,New Jersey Jewish News,,Referring|Jewish|NAmerica
-www.newstatesman.com,New Statesman,,News Source,@NewStatesman,New Statesman,,Referring|International|Europe
+https://www.newstatesman.com,New Statesman,,News Source,@NewStatesman,New Statesman,,Referring|International|Europe
 https://nypost.com,New York Post,,News Source,@nypost,New York Post,,right|Referring|International|NAmerica
 http://www.nytimes.com,New York Times,,News Source,@nytimes,New York Times, ,left-center|Referring|International|NAmerica
 https://www.newsobserver.com,News & Observer,,News Source,@newsobserver,News & Observer,,Referring|International|NAmerica
 https://www.nst.com.my,News Straits Times,,News Source,@NST_Online,News Straits Times,,Referring|International|Asia
 https://www.newsday.com,Newsday,,News Source,@Newsday,Newsday,,Referring|International|NAmerica
-newsmax.com,Newsmax Media,,News Source,@newsmax,Newsmax Media,,Referring|International|NAmerica
+https://www.newsmax.com,Newsmax Media,,News Source,@newsmax,Newsmax Media,,Referring|International|NAmerica
 http://www.newspress.fr,NewsPress FR,,News Source,,NewsPress FR,,Referring|International|Europe
-newsweek.com,Newsweek,,News Source,@Newsweek,Newsweek,,Referring|International|NAmerica
+https://www.newsweek.com,Newsweek,,News Source,@Newsweek,Newsweek,,Referring|International|NAmerica
 https://www.niagarafallsreview.ca,Niagara Falls Review,,News Source,@NiaFallsReview,Niagara Falls Review,,Referring|International|NAmerica
 https://revu.nl/,Nieuwe Revu,,News Source,@NieuweRevu,Nieuwe Revu,,Referring|International|Europe
 http://www.nikkanberita.com,Nikkan Berita,,News Source,,Nikkan Berita,,Referring|International|Asia
-www.nin.co.rs,NIN,,News Source,@NedeljnikNIN,NIN,,Referring|International|Europe
+https://www.nin.co.rs,NIN,,News Source,@NedeljnikNIN,NIN,,Referring|International|Europe
 http://www.noordhollandsdagblad.nl,Noordhollands Dagblad,,News Source,@nhdagblad,Noordhollands Dagblad,,Referring|International|Europe
 http://www.northindiapress.com,North India Press,,News Source,,North India Press,,Referring|International|Asia
 https://www.ntb.no,Norweigan News Agency,,News Source,,Norweigan News Agency,,Referring|International|Europe
@@ -343,7 +343,7 @@ https://www.omannews.gov.om/,Oman News Agency,,News Source,@OmanNewsAgency,Oman 
 http://omanitribune.com/,Omani Tribune,,News Source,@omantribune,Omani Tribune,,Referring|International|MENA
 http://oananews.org,Organization of Asia-Pacific News Agencies,,News Source,@oananews,Organization of Asia-Pacific News Agencies,,Referring|Wire|Asia
 https://www.orlandosentinel.com,Orlando Sentinel,,News Source,@orlandosentinel,Orlando Sentinel,,Referring|International|NAmerica
-outlookindia.com,Outlook,,News Source,@Outlookindia,Outlook,,Referring|International|Asia
+https://www.outlookindia.com,Outlook,,News Source,@Outlookindia,Outlook,,Referring|International|Asia
 https://outreachmagazine.com,Outreach magazine,,News Source,@OutreachMag,Outreach magazine,,Referring|Christian|NAmerica
 https://www.pajhwok.com,Pajhwok News,,News Source,@pajhwok,Pajhwok News,,Referring|International|Asia
 http://pakistanobserver.net,Pakistan Observer,,News Source,@PakObserve,Pakistan Observer,,Referring|International|Asia
@@ -365,14 +365,14 @@ https://www.pohjalainen.fi,Pohjalainen,,News Source,,Pohjalainen,,Referring|Inte
 https://www.politico.com/,Politico,,News Source,@politico,Politico,,left-center|Referring|International|NAmerica
 https://www.politiken.dk,Politiken,,News Source,"@politiken
 ",Politiken,,Referring|International|Europe
-polityka.pl,Polityka,,News Source,@Polityka_pl,Polityka,,Referring|International|Europe
+https://www.polityka.pl,Polityka,,News Source,@Polityka_pl,Polityka,,Referring|International|Europe
 https://www.pressherald.com,Portland Press Herald,,News Source,@PressHerald,Portland Press Herald, ,center|Referring|International|NAmerica
 https://nationalpost.com/,Postmedia news,,News Source,@postmedianet,Postmedia news,,Referring|International|NAmerica
 https://www.premierchristianity.com,Premier Christianity,,News Source,@Christianitymag,Premier Christianity,,Referring|Christian|Europe
 http://www.presenttruthmag.com,Present Truth Magazine,,News Source,,Present Truth Magazine,,Referring|Christian|NAmerica
 http://www.ptinews.com,Press Trust India,,News Source,@PTI_News,Press Trust India,,Referring|International|Asia
 https://www.princegeorgecitizen.com,Prince George Citizen,,News Source,@PGCitizen,Prince George Citizen,,Referring|International|NAmerica
-www.proceso.com.mx,Proceso,,News Source,@proceso,Proceso,,Referring|International|LAmerica
+https://www.proceso.com.mx,Proceso,,News Source,@proceso,Proceso,,Referring|International|LAmerica
 https://www.publico.pt,Publico,,News Source,@Publico,Publico,,Referring|International|Europe
 https://www.pzc.nl,PZC,,News Source,@pzcredactie,PZC,,Referring|International|Europe
 https://www.qatar-tribune.com/,Qatar Tribune,,News Source,@Qatar_Tribune,Qatar Tribune,,Referring|International|MENA
@@ -400,8 +400,8 @@ https://www.sandiegouniontribune.com,San Diego Union Tribune,,News Source,@sdut,
 https://www.satellitetoday.com,Satellite Today,,News Source,@Via_Satellite,Satellite Today,,Referring|International|NAmerica
 https://www.spa.gov.sa/,Saudi Press Agency,,News Source,@Spa_Eng,Saudi Press Agency,,Referring|Wire|MENA
 http://www.scoop.co.nz,Scoop,,News Source,@ScoopNZ,Scoop,,Referring|International|Oceania
-http://seattletimes.com,Seattle Times,,News Source,@seattletimes,Seattle Times,,Referring|International|NAmerica
-www.semana.com,Semana,,News Source,@RevistaSemana,Semana,,Referring|International|LAmerica
+https://www.seattletimes.com,Seattle Times,,News Source,@seattletimes,Seattle Times,,Referring|International|NAmerica
+https://www.semana.com,Semana,,News Source,@RevistaSemana,Semana,,Referring|International|LAmerica
 http://www.signstimes.com,Signs of the Times,,News Source,@SOTTnet,Signs of the Times,,Referring|Christian|NAmerica
 https://www.singingnews.com,Singing News,,News Source,@singingnews,Singing News,,Referring|Christian|NAmerica
 https://slate.com/,Slate,,News Source,@Slate,Slate, ,left|Referring|International|NAmerica
@@ -416,12 +416,12 @@ https://www.tagblatt.ch,St. Galler Tagblatt,,News Source,@tagblatt_ch,St. Galler
 https://www.stljewishlight.com/,St. Louis Jewish Light,,News Source,@StLJewishLight,St. Louis Jewish Light,,Referring|Jewish|NAmerica
 https://www.star-telegram.com,Star-Telegram,,News Source,@startelegram,Star-Telegram,,Referring|International|NAmerica
 http://www.startribune.com,Star-Tribune,,News Source,@StarTribune,Star-Tribune,,Referring|International|NAmerica
-www.stern.de,Stern,,News Source,@sternde,Stern,,Referring|International|Europe
+https://www.stern.de,Stern,,News Source,@sternde,Stern,,Referring|International|Europe
 https://stt.fi/en/,STT,,News Source,@STTuutiset,STT,,Referring|International|Europe
 http://www.sunanews.net,Sudan News Agency,,News Source,@SUNA_Agency,Sudan News Agency,,Referring|Wire|MENA
 https://www.sueddeutsche.de,Sueddeutsche Zeitung,,News Source,@SZ,Sueddeutsche Zeitung,,Referring|International|Europe
 http://sun-sentinel.com,Sun-Sentinel,,News Source,@SunSentinel,Sun-Sentinel,,Referring|International|NAmerica
-www.suomenkuvalehti.fi,Suomen Kuvalehti,,News Source,@SuomenKuvalehti,Suomen Kuvalehti,,Referring|International|Europe
+https://www.suomenkuvalehti.fi,Suomen Kuvalehti,,News Source,@SuomenKuvalehti,Suomen Kuvalehti,,Referring|International|Europe
 https://www.swordofthelord.com,Sword of the Lord,,News Source,@swordofthelord,Sword of the Lord,,Referring|Christian|NAmerica
 https://www.smh.com.au,Sydney Morning Herald,,News Source,@smh,Sydney Morning Herald,,Referring|International|Oceania
 http://syriatimes.sy,Syria Times,,News Source,@syriatimes_sy,Syria Times,,Referring|International|MENA
@@ -446,7 +446,7 @@ https://www.azcentral.com,The Arizona Republic,,News Source,@azcentral,The Arizo
 https://www.arkansasonline.com,The Arkansas Democrat-Gazette,,News Source,@ArkansasOnline,The Arkansas Democrat-Gazette, ,left|Referring|International|NAmerica
 https://www.ap.org/,The Associated Press,,News Source,@AP,The Associated Press,,Referring|Wire|NAmerica
 https://www.ajc.com,The Atlanta Journal-Constitution,,News Source,@ajc,The Atlanta Journal-Constitution, ,left-center|Referring|International|NAmerica
-www.theatlantic.com,The Atlantic,,News Source,@TheAtlantic,The Atlantic,,Referring|International|NAmerica
+https://www.theatlantic.com,The Atlantic,,News Source,@TheAtlantic,The Atlantic,,Referring|International|NAmerica
 https://www.theaustralian.com.au,The Australian,,News Source,@australian,The Australian,,Referring|International|Oceania
 https://www.jewishnews.net.au,The Australian Jewish News,,News Source,@aus_jewishnews,The Australian Jewish News,,Referring|Jewish|Oceania
 https://thebaffler.com,The Baffler,,News Source,@thebafflermag,The Baffler,,Referring|International|NAmerica
@@ -501,15 +501,15 @@ https://www.theledger.com,The Ledger,,News Source,@theledger,The Ledger,,Referri
 https://www.thelocal.de,The Local,,News Source,@TheLocalGermany,The Local,,Referring|International|Europe
 https://www.miamiherald.com,The Miami Herald,,News Source,@MiamiHerald,The Miami Herald,,left-center|Referring|International|NAmerica
 http://www.milligazette.com,The Milli Gazette,,News Source,@milligazette,The Milli Gazette,,Referring|International|Asia
-www.thenation.com,The Nation,,News Source,@thenation,The Nation,,Referring|International|NAmerica
+https://www.thenation.com,The Nation,,News Source,@thenation,The Nation,,Referring|International|NAmerica
 http://nationalpost.com,The National Post,,News Source,@nationalpost,The National Post,,Referring|International|NAmerica
 https://www.alaraby.co.uk,The New Arab,,News Source,@alarabytv,The New Arab,,Referring|International|Europe
-newrepublic.com,The New Republic,,News Source,@newrepublic,The New Republic,,Referring|International|NAmerica
-newtimes.ru,The New Times,,News Source,@the_newtimes,The New Times,,Referring|International|Europe
+https://www.newrepublic.com,The New Republic,,News Source,@newrepublic,The New Republic,,Referring|International|NAmerica
+https://www.newtimes.ru,The New Times,,News Source,@the_newtimes,The New Times,,Referring|International|Europe
 http://jewishweek.timesofisrael.com/,The New York Jewish Week,,News Source,@NYJewishWeek,The New York Jewish Week,,Referring|Jewish|NAmerica
 https://www.nysun.com,The New York Sun,,News Source,@NewYorkSun,The New York Sun,,Referring|International|NAmerica
 https://www.newyorker.com/,The New Yorker,,News Source,@NewYorker,The New Yorker, ,left|Referring|International|NAmerica
-thenortheasttoday.com,The Northeast Today,,News Source,@TNT_Magazine,The Northeast Today,,Referring|International|Asia
+https://thenortheasttoday.com,The Northeast Today,,News Source,@TNT_Magazine,The Northeast Today,,Referring|International|Asia
 https://oklahoman.com,The Oklahoman,,News Source,@theoklahoman_,The Oklahoman,,Referring|International|NAmerica
 https://www.ocregister.com,The Orange County Register,,News Source,@ocregister,The Orange County Register,,right-center|Referring|International|NAmerica
 https://www.oregonlive.com,The Oregonian,,News Source,@Oregonian,The Oregonian,,Referring|International|NAmerica
@@ -546,7 +546,7 @@ http://www.tripolipost.com,The Tripoli Post,,News Source,@ResearchSnipers,The Tr
 https://vancouversun.com,The Vancouver Sun,,News Source,@VancouverSun,The Vancouver Sun,,Referring|International|NAmerica
 https://pilotonline.com,The Virginian-Pilot,,News Source,@virginianpilot,The Virginian-Pilot,,Referring|International|NAmerica
 https://www.washingtonpost.com,The Washington Post,,News Source,@washingtonpost,The Washington Post,,left-center|Referring|International|NAmerica
-www.theweek.in,The Week,,News Source,@TheWeekLive,The Week,,Referring|International|Asia
+https://www.theweek.in,The Week,,News Source,@TheWeekLive,The Week,,Referring|International|Asia
 https://www.kansas.com,The Wichita Eagle,,News Source,@kansasdotcom,The Wichita Eagle,,Referring|International|NAmerica
 https://windsorstar.com,The Windsor Star,,News Source,@TheWindsorStar,The Windsor Star,,Referring|International|NAmerica
 http://www.yemenpost.net,The Yemen Times,,News Source,@YemenPostNews,The Yemen Times,,Referring|International|MENA
@@ -565,8 +565,8 @@ https://www.tulsaworld.com,Tulsa World,,News Source,@tulsaworld,Tulsa World,,Ref
 https://www.tap.info.tn,Tunis Afrique Presse,,News Source,@AgenceTAP,Tunis Afrique Presse,,Referring|Wire|MENA
 http://www.hurriyetdailynews.com,Turkish Daily News,,News Source,@HDNER,Turkish Daily News,,Referring|International|MENA
 https://www.ts.fi,Turun Sanomat,,News Source,@turunsanomat,Turun Sanomat,,Referring|International|Europe
-tyden.cz,Týden,,News Source,@Tydencz,Týden,,Referring|International|Europe
-usnews.com,U.S. News & World Report,,News Source,@usnews,U.S. News & World Report,,Referring|International|NAmerica
+https://www.tyden.cz,Týden,,News Source,@Tydencz,Týden,,Referring|International|Europe
+https://www.usnews.com,U.S. News & World Report,,News Source,@usnews,U.S. News & World Report,,Referring|International|NAmerica
 https://www.ucanews.com,Union of Catholic Asian News,,News Source,@Ucanews,Union of Catholic Asian News,,Referring|Christian|Asia
 http://www.una-oic.org,Union of Organization of Islamic Countries News Agencies,,News Source,@IINANews_En,Union of Organization of Islamic Countries News Agencies,,Referring|Wire|MENA
 http://www.uniindia.com,United News of India,,News Source,@uniindianews,United News of India,,Referring|International|Asia
@@ -574,7 +574,7 @@ https://www.upi.com,United Press International,,News Source,@upi,United Press In
 https://www.usatoday.com,USA Today,,News Source,@usatoday,USA Today, ,center|Referring|International|NAmerica
 http://vancouversun.com,Vancouver Sun,,News Source,@VancouverSun,Vancouver Sun,,Referring|International|NAmerica
 https://veja.abril.com.br,Veja,,News Source,@VEJA,Veja,,Referring|International|LAmerica
-visao.sapo.pt,Visão,,News Source,@Visao_pt,Visão,,Referring|International|Europe
+https://www.visao.sapo.pt,Visão,,News Source,@Visao_pt,Visão,,Referring|International|Europe
 https://www.insidevoa.com,Voice of America,,News Source,@insidevoa,Voice of America,,Referring|International|NAmerica
 https://www.vomcanada.com,Voice of the Martyrs Canada,,News Source,@vomc,Voice of the Martyrs Canada,,Referring|Christian|NAmerica
 https://www.vox.com,Vox,,News Source,@voxdotcom,Vox, ,left|Referring|International|NAmerica
@@ -588,7 +588,7 @@ https://www.westhawaiitoday.com,West Hawaii Today,,News Source,@westhawaiitoday,
 https://www.whittierdailynews.com,Whittier Daily News,,News Source,@WhittierNews,Whittier Daily News,,Referring|International|NAmerica
 https://www.winnipegfreepress.com,Winnipeg Free Press,,News Source,@WinnipegNews,Winnipeg Free Press,,Referring|International|NAmerica
 https://www.jewishchronicle.org/,Wisconsin Jewish Chronicle,,News Source,@WIJewish,Wisconsin Jewish Chronicle,,Referring|Jewish|NAmerica
-world.wng.org,World,,News Source,@WNGdotorg,World,,Referring|International|NAmerica
+https://world.wng.org,World,,News Source,@WNGdotorg,World,,Referring|International|NAmerica
 https://www.wsws.org,World Socialist Website,,News Source,@WSWS_Updates,World Socialist Website,,Referring|International|NAmerica
 https://www.worldwatchmonitor.org,World Watch Monitor,,News Source,@wwmonitor,World Watch Monitor,,Referring|Christian|NAmerica
 https://www.worthynews.com,Worth News,,News Source,@worthynews,Worth News,,Referring|Christian|NAmerica
@@ -608,7 +608,7 @@ http://mekomit.co.il,Sikha Mekomit,,News Source,@mekomit,972Mag,sikha mekomit|Lo
 http://en.globes.co.il,Globes - English,,News Source,@GlobesEnglish,Globes,גלובס,Israeli|English|Financial|center|Source|MENA
 http://gpoeng.gov.il,Israeli Government Press Office - English,,News Source,@GPOIsrael,Israeli Government Press Office,Israeli Government Press Office,Israeli|English|Official|center|Source|MENA
 http://www.maannews.com/,Ma'an News Agency,,News Source,@MaanNewsAgency,Ma'an News Agency,Ma'an News Agency|Ma'an,Palestinian|English|Current-Affairs|Source|MENA
-http://nocamels.com,Nocamels,,News Source,@NoCamels,Nocamels,Nocamels,Israeli|English|Innovation-Tech|Source|MENA
+http://www.nocamels.com,Nocamels,,News Source,@NoCamels,Nocamels,Nocamels,Israeli|English|Innovation-Tech|Source|MENA
 http://palestinechronicle.com/,Palestine Chronicle,,News Source,@PalestineChron,Palestine Chronicle,Palestine Chronicle,Palestinian|English|Current-Affairs|Source|MENA
 http://english.pnn.ps/,Palestine News Network,,News Source,@pnnenglish,Palestine News Network,Palestine News Network,Palestinian|English|Current-Affairs|Source|MENA
 https://www.debka.com/,Debka File - English,,News Source,@debkafile|@debka_english,Debka File,Debka File,Israeli|English|Security|right|Source|MENA
@@ -624,9 +624,9 @@ http://haaretz.co.il/,Haaretz - Hebrew,,News Source,@Haaretz,Haaretz,הארץ,Is
 https://www.wafa.ps/,Wafa (Palestinian News and Info Agency) - Arabic,,News Source,@WAFA_PS,Wafa (Palestinian News and Information),,Palestinian|Arabic|Current-Affairs|Source|MENA
 http://english.wafa.ps/,Wafa (Palestinian News and Info Agency) - English,,News Source,@WAFANewsEnglish,Wafa (Palestinian News and Information),Wafa|Palestinian News and Info Agency,Palestinian|English|Current-Affairs|Source|MENA
 http://israelnationalnews.com/,Arutz 7 - English,,News Source,@ArutzSheva_En,Arutz 7,Arutz 7|Israel National News,Israeli|English|Current-Affairs|right|Source|MENA
-http://inn.co.il/,Arutz 7 - Hebrew,,News Source,@arutz7heb,Arutz 7,ערוץ 7,Israeli|Hebrew|Current-Affairs|right|Source|MENA
+http://www.inn.co.il/,Arutz 7 - Hebrew,,News Source,@arutz7heb,Arutz 7,ערוץ 7,Israeli|Hebrew|Current-Affairs|right|Source|MENA
 http://makorrishon.co.il/,Makor Rishon,,News Source,@MakorRishon,Israel Hayom,Makor Rishon,Israeli|Hebrew|Current-Affairs|right|Source|MENA
-http://hamodia.com/,HaModia,,News Source,@HamodiaUS,HaModia,HaModia,Israeli|Hebrew|Current-Affairs|right-center|Source|NAmerica
+http://www.hamodia.com/,HaModia,,News Source,@HamodiaUS,HaModia,HaModia,Israeli|Hebrew|Current-Affairs|right-center|Source|NAmerica
 http://www.jdn.co.il/,Jewish Ultra-Orthodox News,,News Source,@JDNfeed,HaModia,Jewish Ultra-Orthodox News|HaModia,Israeli|Hebrew|Current-Affairs|right-center|Source|MENA
 http://shehaben.com/,Shehab News Agency,,News Source,@ShehabAgency,Shehab News,,Palestinian|English|Official|Current-Affairs|Source|MENA
 https://www.gaza48.com/,GAZA NEWS 48,,News Source,@MousaNews,GAZA NEWS 48,,Palestinian|Arabic|Current-Affairs|Source|MENA
@@ -682,7 +682,7 @@ https://www.gaza48.com/,GAZA NEWS 48,,News Source,@MousaNews,GAZA NEWS 48,,Pales
 @UriahCanaff,Uriah Canaf,,Twitter Handle,,Ha'aretz,,Source Journalist
 @yishaih,Yishai Halper,,Twitter Handle,,Ha'aretz,,Source Journalist
 @yotberg,Yotam Berger,,Twitter Handle,,Ha'aretz,,Source Journalist
-amirtibon,Amir Tibon,,Twitter Handle,,Ha'aretz,,Source Journalist
+@amirtibon,Amir Tibon,,Twitter Handle,,Ha'aretz,,Source Journalist
 @arik3000,Ariel Kahana,,Twitter Handle,,Israel Hayom EN,,Source Journalist
 @BismuthBoaz,Boaz Bismuth,,Twitter Handle,,Israel Hayom EN,,Source Journalist
 @DanLavie1,Dan Lavie,,Twitter Handle,,Israel Hayom EN,,Source Journalist
@@ -830,7 +830,7 @@ amirtibon,Amir Tibon,,Twitter Handle,,Ha'aretz,,Source Journalist
 @ynetnews,Institutional,,Twitter Handle,,Ynet,,Source Journalist
 @yoavzitun,Yoav Zitun,,Twitter Handle,,Ynet,,Source Journalist
 @YoazHendel1 ‏,Yoaz Hendel,,Twitter Handle,,Ynet,,Source Journalist
-RazShechnik@ ‏,Raz Shechnik,,Twitter Handle,,Ynet,,Source Journalist
+@RazShechnik ‏,Raz Shechnik,,Twitter Handle,,Ynet,,Source Journalist
 @MattiFriedman,Matti Friedman,,Twitter Handle,,,,Referring
 @NahlahAyed,Nahlah Ayed,,Twitter Handle,,,,Referring
 @_HadleyGamble,Hadley Gamble,,Twitter Handle,,,,Referring
