@@ -56,9 +56,9 @@ def mini_processor(name, tag):
                                 "Mentions": tweet["mentions"].tolist(),
                                 "Hashtags": tweet["hashtags"].tolist(),
                                 "Found URL": tweet["urls"].tolist()})
-        retweet.to_csv("mini/" + name + '.csv', index=False, encoding='utf-8-sig', quoting=csv.QUOTE_NONNUMERIC)  # nopep8
-    except(Exception):
-        print("File not found: " + name)
+        retweet.to_csv("./mini/" + name + '.csv', index=False, encoding='utf-8-sig', quoting=csv.QUOTE_NONNUMERIC)  # nopep8
+    except Exception as e:
+        print(e)
         pass
 
 def add_headers():
@@ -81,3 +81,4 @@ def pre_processer(file):
 
 if __name__ == '__main__':
     pre_processer("twitter.csv")
+    # pre_processer("/voyage_storage/mediacat-twitter-crawler/twitter.csv")
