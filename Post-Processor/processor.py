@@ -1,3 +1,13 @@
+""" 
+processor.py
+Author: Amy Gao
+Date: March 15, 2021
+Description: This script takes crawler output files and then 
+creates links between articles using url, twitter handle and text aliases.
+Returns a JSON file containing nodes for each article and its corresponding information.
+Usage: "python3 processor.py"
+Output: link_title_list.json
+"""
 import json, os
 import re
 import csv 
@@ -9,8 +19,9 @@ import logging
 import sys, traceback
 logging.basicConfig(filename='./logs/processor.log', level=logging.DEBUG, filemode='w')
 
-"""Loads the domain output json into a dictionary"""
 def load_json():
+    """Loads the domain output json from folder ./DomainOutput/ into a dictionary.
+    Returns domain data dict and a dict of domain id to url and domain pairings."""
     # used to parse domain files in a folder called results
     logging.info("Loading domain files")
     path_to_json = './DomainOutput/'
@@ -27,8 +38,10 @@ def load_json():
             pairings[data['id']] = {'url': data['url'], 'domain': data['domain']}
     return all_data, pairings
 
-"""Loads the twitter output csv into a dictionary"""
+
 def load_twitter_csv():
+    """Loads the twitter output csv from folder ./TwitterOutput/ into a dictionary
+    Returns twitter data dict and a dict of twitter id to url and domain pairings."""
     logging.info("Loading twitter files")
     data = {}
     pairings = {}
@@ -37,8 +50,7 @@ def load_twitter_csv():
         with open(path + file_name, mode='r', encoding='utf-8-sig') as csv_file:
             for line in csv.DictReader(csv_file):
                 if not(line['Found URL'] and line['Hashtags'] and line['Mentions']):
-                    print("Line format not properly formed :" + line)
-                    logging.warning("Line format not properly formed :" + line)
+                    logging.warning("Line format not properly formed :" + line['URL to article/Tweet'] + line['Hit Record Unique ID'])
                     continue
                 else:
                     try:
@@ -46,16 +58,25 @@ def load_twitter_csv():
                         hashtags = ast.literal_eval(line['Hashtags'])
                         mentions = ast.literal_eval(line['Mentions']) 
                     except:
-                        logging.warning("Line format not properly formed :" + line)
+                        logging.warning("Line format not properly formed :" + line['URL to article/Tweet'] + line['Hit Record Unique ID'])
+                
+                try: 
+                    language = line['Language']
+                except: 
+                    language = ""
                 pairings[line['Hit Record Unique ID']] = {'url': line['URL to article/Tweet'], 'domain': line['Source']}
                 data[line['URL to article/Tweet']] = {'url': line['URL to article/Tweet'], 'id': line['Hit Record Unique ID'], 'domain': line['Source'], 
-                'Location': line['Location'], 'type': "twitter", 'Tags': line['Passed through tags'], "language": "",
+                'Location': line['Location'], 'type': "twitter", 'Tags': line['Passed through tags'], "language": language,
                 'Associated Publisher' : line['Associated Publisher'], 'author_metadata': line['Authors'], 'article_text': line['Plain Text of Article or Tweet'],
                 'date': line['Date'], 'Mentions': mentions, 'Hashtags': hashtags, 'found_urls': lst, 'completed': False}
     return data, pairings
 
-"""Loads the scope csv into a dictionary."""
+
 def load_scope(file):
+    """
+    Loads the scope csv into a dictionary.
+    Returns a dict of the scope with Source as key.
+    """
     logging.info("Loading scope")
     # parse all the text aliases from each source using the scope file
     scope = {}
@@ -79,27 +100,25 @@ def load_scope(file):
     write_to_file(scope, "scope.json")
     return scope 
 
-"""
-Finds all the text aliases and twitter handles in this node's text.
-Returns a list of sources in scope that have been mentioned in this node's text, as well as
-a list of twitter handles found that are not in the scope.
-Parameters:
-    data: the data dictionary
-    node: the node in the dictionary that we are searching on
-    scope: the scope dictionary
-Returns:
-    Returns 2 lists in a tuple:
-    found aliases is a list of all the sources that this article node refers to
-    random tweets is a list of all twitter handles found that are not in the scope
-"""
-# finds all the aliases that are in this node's text
-# returns a list of urls that it is referring to
 def find_aliases(data, node, scope):
+    """
+    Finds all the text aliases and twitter handles in this node's text.
+    Returns a list of sources in scope that have been mentioned in this node's text, as well as
+    a list of twitter handles found that are not in the scope.
+    Parameters:
+        data: the data dictionary
+        node: the node in the dictionary that we are searching on
+        scope: the scope dictionary
+    Returns 2 lists in a tuple:
+        - found aliases is a list of all the sources that this article node refers to
+        - random tweets is a list of all twitter handles found in the plain text that are not in the scope
+    """
     found_aliases = []
     twitters = []
     sequence = data[node]['article_text']
     for source, info in scope.items():
         if data[node]['domain'] == source:
+            # ignore self-referrals
             continue
         src = [source]
         pattern = r"(\W|^)(%s)(\W|$)" % "|".join(src)
@@ -128,16 +147,16 @@ def find_aliases(data, node, scope):
 
     return found_aliases, random_tweets
 
-"""
-Processes the twitter data by finding all the articles that are referring to it
-and mutating the output dictionary. 
-Parameters: 
-    data: the twitter output dictionary
-    scope: the scope dictionary
-    output: the output dictionary to add to 
-    interest_output: the of interest dictionary of articles not in the scope
-"""
+
 def process_twitter(data, scope):
+    """
+    Processes the twitter data by finding all the articles that are referring to it
+    and mutating the output dictionary. 
+    Parameters: 
+        data: the twitter output dictionary
+        scope: the scope dictionary
+    Returns 2 dicts, one for the mutated data dictionary, and another dict of referrals.
+    """
     logging.info("Processing Twitter")
     try:
         start = timer()
@@ -176,16 +195,17 @@ def process_twitter(data, scope):
         raise
     return data, referrals
 
-"""
-Processes the domain data by finding all the articles that it is referring to and 
-articles that are referring to it and mutating the output dictionary. 
-Parameters: 
-    data: the domain output dictionary
-    scope: the scope dictionary
-    output: the output dictionary to add to 
-    interest_output: the of interest dictionary of articles not in the scope
-"""
+
 def process_domain(data, scope):
+    """
+    Processes the domain data by finding all the articles that it is referring to and 
+    articles that are referring to it and mutating the output dictionary. 
+    Parameters: 
+        data: the domain output dictionary
+        scope: the scope dictionary
+    Return:
+        Returns 2 dicts, one for the mutated data dictionary, and another dict of referrals.
+    """
     logging.info("Processing Domain")
     try:
         start = timer()
@@ -196,9 +216,9 @@ def process_domain(data, scope):
             if data[node]['completed']:
                 continue
             found_aliases, twitter_handles = find_aliases(data, node, scope)
-            # each key in links is an article url, and it has a list of article ids that are talking about it
+            # each key in links is an article url, and it has a list of article ids that are referring it
             for link in data[node]['found_urls']:
-                # save all referrals where the key is each link in 'found_urls' and the value is this article's id
+                # save all referrals where each key is each link in 'found_urls' and the value is this article's id
                 if link['url'] in referrals:
                     referrals[link['url']].append(data[node]['id'])
                 else:
@@ -210,6 +230,7 @@ def process_domain(data, scope):
                     referrals[source].append(data[node]['id'])
                 else:
                     referrals[source] = [data[node]['id']]
+
             data[node]['completed'] = True
             num_processed += 1
 
@@ -225,10 +246,11 @@ def process_domain(data, scope):
         write_to_file(data, "Saved/domain_data.json")
         raise
     return data, referrals
-"""
-Creates the data format for the output json
-"""
+
 def create_output(article, referrals, scope, output, interest_output, domain_pairs, twitter_pairs):
+    """
+    Creates the data format for the output json by mutating the output and interest output object.
+    """
     
     if article["domain"] in scope.keys():
         # article is in scope
@@ -282,16 +304,16 @@ def create_output(article, referrals, scope, output, interest_output, domain_pai
                     'date of publication':article['date'], 
                     'top referrals': dict(itertools.islice(top.items(), 5))} 
                     # top referrals gets the top 5 domains that referred to this article the most
-"""
-Cross-match the referrals for domain referrals and twitter referrals.
-Returns a list of all sources that are referring to this specific article.
-Params:
-    article: an article in the data
-    domain_referrals: a dictionary of all the referrals in the domain data
-    twitter_referrals: a dictionary of all the referrals in the twitter data
-"""
-def parse_referrals(article, domain_referrals, twitter_referrals):
 
+def parse_referrals(article, domain_referrals, twitter_referrals):
+    """
+    Cross-match the referrals for domain referrals and twitter referrals.
+    Returns a list of all sources that are referring to this specific article.
+    Parameters:
+        article: an article in the data
+        domain_referrals: a dictionary of all the referrals in the domain data
+        twitter_referrals: a dictionary of all the referrals in the twitter data
+    """
     referring_articles = []
     # get all referrals for this url (who is referring to me)
     if article['url'] in domain_referrals:
@@ -306,47 +328,55 @@ def parse_referrals(article, domain_referrals, twitter_referrals):
     if article['id'] in referring_articles: referring_articles.remove(article['id'])
     return referring_articles
 
-"""
-The main point of entry for the processor. Calls the domain and twitter 
-processor seperately.
-Parameters:
-    domain_data: domain dictionary
-    twitter_data: twitter dictionary
-    scope: scope dictionary
 
-Outputs the post processing data into output.json
-"""
 def process_crawler(domain_data, twitter_data, scope, domain_pairs, twitter_pairs, saved_domain_referrals = {}, saved_twitter_referrals = {}):
+    """
+    The main point of entry for the processor. 
+    Calls the domain and twitter processor seperately.
+    Parameters:
+        domain_data: domain dictionary
+        twitter_data: twitter dictionary
+        scope: scope dictionary
+        domain_pairs: domain dictionary mapping article id to url
+        twitter_pairs: twitter dictionary mapping tweet id to url
+        saved_domain_referrals: A dictionary of saved domain referrals, with mapping of url to id.
+        saved_twitter_referrals: A dictionary of saved twitter referrals, with mapping of url to id.
+
+    Outputs the post processing data into output.json and interest_output.json.
+    """
     output = {}
     interest_output = {}
     # get a dictionary of all the referrals for each source
     domain_data, domain_referrals = (process_domain(domain_data, scope))
     # save referrals to file in case of break
     write_to_file(domain_data, "Saved/domain_data.json")
+    write_to_file(domain_referrals, "Saved/domain_referrals.json")
     if saved_domain_referrals != {}:
+        # merge saved referrals and newly found referrals
         new = {key: value + saved_domain_referrals[key] for key, value in domain_referrals.items()}
         saved_domain_referrals.update(new)
         domain_referrals = saved_domain_referrals
-
-    write_to_file(domain_referrals, "Saved/domain_referrals.json")
+        write_to_file(domain_referrals, "Saved/domain_referrals.json")
 
     twitter_data, twitter_referrals = (process_twitter(twitter_data, scope))
     # save referrals to file in case of break
     write_to_file(twitter_data, "Saved/twitter_data.json")
+    write_to_file(twitter_referrals, "Saved/twitter_referrals.json")
     if saved_twitter_referrals != {}:
+        # merge saved referrals and newly found referrals
         new = {key: value + saved_twitter_referrals[key] for key, value in twitter_referrals.items()}
         saved_twitter_referrals.update(new)
         twitter_referrals = saved_twitter_referrals
+        write_to_file(twitter_referrals, "Saved/twitter_referrals.json")
 
-    write_to_file(twitter_referrals, "Saved/twitter_referrals.json")
-
-     # create static nodes
+    # create static nodes
     nodes = create_static_nodes(scope)
     # add these nodes to domain_data, prioritize domain_data if duplications
     nodes.update(domain_data)
     domain_data = nodes
-    # cross match between domain and twitter data and creat the output dictionary
+    
     start = timer()
+    # cross match between domain and twitter data and create the output dictionary
     for node in domain_data:
         referring_articles = parse_referrals(domain_data[node], domain_referrals, twitter_referrals)
         create_output(domain_data[node], referring_articles, scope, output, interest_output, domain_pairs, twitter_pairs)
@@ -362,6 +392,7 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs, twitter_pair
     logging.info("Output "+ str(len(output)) + " articles in scope and "+ str(len(interest_output)) + " articles in interest scope")
     start = timer()
 
+    # write final output to file
     write_to_file(output, "Output/output.json")
     # Sorts interest output 
     interest_output = dict(sorted(interest_output.items(), key=lambda item: item[1]['hit count'], reverse=True))
@@ -371,6 +402,7 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs, twitter_pair
     logging.info("Serializing and writing final json output - Took " + str(end - start) + " seconds")
 
 def write_to_file(dict, filename):
+    """ Writes the dict to a json file with the given filename."""
     # Serializing json    
     json_object = json.dumps(dict, indent = 4)  
 
@@ -379,6 +411,7 @@ def write_to_file(dict, filename):
         outfile.write(json_object) 
 
 def load_saved_files():
+    """Loads saved files from previous processor run and returns them as dicts."""
     with open('Saved/domain_data.json') as json_file: 
         domain_data = json.load(json_file) 
   
@@ -387,11 +420,15 @@ def load_saved_files():
 
     with open('Saved/domain_referrals.json') as json_file: 
         domain_referrals = json.load(json_file) 
+
     with open('Saved/twitter_referrals.json') as json_file: 
         twitter_referrals = json.load(json_file) 
+
     return domain_data, twitter_data, domain_referrals, twitter_referrals
 
 def create_static_nodes(scope):
+    """Creates nodes of type domain, twitter handle and text aliases, using each source from the scope.
+    Returns created nodes in a dict."""
     data = {}
     for source in scope:
         # create node for source (twitter handle or domain)
@@ -399,6 +436,7 @@ def create_static_nodes(scope):
             node_type = "domain"
         else:
             node_type = "twitter handle"
+        # create uuid from string
         uid = str(uuid.uuid5(uuid.NAMESPACE_DNS, source))
         data[source] = {'id': uid, 'url': source,
                     'domain': source, 
@@ -438,21 +476,26 @@ def create_static_nodes(scope):
 
 
 if __name__ == '__main__':
-    load_saved_files()
+    # change this flag to true if restarting after a break, and want to use saved data.
     read_from_memory = False
+
     start = timer()
     scope_timer = timer()
+    # load scope
     scope = load_scope('./input_scope_final.csv')
     scope_timer_end = timer()
-    
 
     twitter_timer = timer()
+    # load twitter data
     twitter_data, twitter_pairs = load_twitter_csv()
     twitter_timer_end = timer()
+
     domain_timer = timer()
+    # load domain data
     domain_data, domain_pairs = load_json()
     domain_timer_end = timer()
     if read_from_memory: 
+        # read saved data into memory
         domain_data, twitter_data, domain_referrals, twitter_referrals = load_saved_files()
         process_crawler(domain_data, twitter_data, scope, domain_pairs, twitter_pairs, domain_referrals, twitter_referrals)
     else:   
