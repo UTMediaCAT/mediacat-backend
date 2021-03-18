@@ -48,6 +48,7 @@ def mini_processor(name, tag):
                                 "Location": tweet["place"].tolist(),
                                 "Hit Type": "Twitter Handle",
                                 "Passed through tags": tag,
+                                "Language": tweet["language"].tolist(),
                                 "Associated Publisher": np.nan,
                                 "Referring Hit Record Unique ID": np.nan,
                                 "Authors": tweet["name"].tolist(),
@@ -56,12 +57,15 @@ def mini_processor(name, tag):
                                 "Mentions": tweet["mentions"].tolist(),
                                 "Hashtags": tweet["hashtags"].tolist(),
                                 "Found URL": tweet["urls"].tolist()})
-        retweet.to_csv("./mini/" + name + '.csv', index=False, encoding='utf-8-sig', quoting=csv.QUOTE_NONNUMERIC)  # nopep8
+        retweet.to_csv("./tester/" + name + '.csv', index=False, encoding='utf-8-sig', quoting=csv.QUOTE_NONNUMERIC)  # nopep8
     except Exception as e:
         print(e)
         pass
 
 def add_headers():
+    """
+    add correct headers to twitter csv files.
+    """
     path = './csv/'
     for file_name in [file for file in os.listdir(path) if file.endswith('.csv')]:
         try:
