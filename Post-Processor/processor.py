@@ -255,9 +255,9 @@ def create_output(article, referrals, scope, output, interest_output, domain_pai
     if article["domain"] in scope.keys():
         # article is in scope
 
-        if article['type'] in ["domain", "twitter handle", "text aliases"] and len(referrals) == 0:
+        if (article['type'] == "domain" or article['type'] == "twitter handle" or article['type'] == "text aliases") and len(referrals) == 0:
             # does not include these static nodes in output if referral count is 0.
-            pass
+            return
         output[article['id']] = {'id': article['id'], 
                     'url or alias text':article['url'], 
                     'referring record id':referrals,
