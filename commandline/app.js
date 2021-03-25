@@ -7,7 +7,7 @@ require('dotenv').config();
 const PATH_SCOPE_PARSER = process.env.COMMANDLINE_PATH_SCOPE_PARSER || '../../mediacat-frontend/scope_parser/main.py';
 const PATH_INPUT_CSV = process.env.COMMANDLINE_PATH_INPUT_CSV || '../../mediacat-frontend/scope_parser/csv/test_demo.csv';
 
-const PATH_TWITTER_CRAWLER= process.env.COMMANDLINE_PATH_TWITTER_CRAWLER || '../../mediacat-twitter-crawler/twitter_crawler.py';
+const PATH_TWITTER_CRAWLER= process.env.COMMANDLINE_PATH_TWITTER_CRAWLER || '../../mediacat-twitter-crawler/main.py';
 const PATH_DOMAIN_CRAWLER= process.env.COMMANDLINE_PATH_DOMAIN_CRAWLER || '../../mediacat-domain-crawler/newCrawler/crawl.js';
 
 const FAILED_DOMAIN_LINKS= process.env.COMMANDLINE_FAILED_DOMAIN_LINKS || './failed_links_list.json';
@@ -18,11 +18,18 @@ const twittercsvFile = process.env.COMMANDLINE_twittercsvFile || './twitter.csv'
 
 const metadataJSON = process.env.COMMANDLINE_metadataJSON || './metadata_modified_list.json';
 
+const start_date = process.env.COMMANDLINE_TWT_START_DATE || null;
+const end_date = process.env.COMMANDLINE_TWT_END_DATE || null;
+const keyword = process.env.COMMANDLINE_TWT_KEYWORD || null;
+
 /**
  * checks for the correct number of arguments and calles the appropriate function
  * `node app.js twitter ` to run the twitter crawler
+ * `set in .env start_date end_date` to run the twitter crawler with dates
+ * `set in .env start_date end_date keyword` to run the twitter crawler with dates and a keyword
  * `node app.js domain ` to run the domain crawler
  * `node app.js` to run everything
+ * dates in YYYY-MM-DD form
  */
 
 function run() {
@@ -145,9 +152,21 @@ function stepTwoTwitter() {
    */
   
   try {
-    const pythonProcess2 = childProcess.spawn( `python3 ${PATH_TWITTER_CRAWLER} ${twittercsvFile}`, {
+
+    let pythonProcess2 = childProcess.spawn( `python3 ${PATH_TWITTER_CRAWLER} ${twittercsvFile}`, {
       shell: true
     });
+
+    if (start_date !== null && end_date != null && keyword != null ) {
+      pythonProcess2 = childProcess.spawn( `python3 ${PATH_TWITTER_CRAWLER} ${twittercsvFile} ${start_date} ${end_date} ${keyword}`, {
+        shell: true
+      });
+
+    } else if (start_date !== null && end_date != null ) {
+      pythonProcess2 = childProcess.spawn( `python3 ${PATH_TWITTER_CRAWLER} ${twittercsvFile} ${start_date} ${end_date}`, {
+        shell: true
+      });
+    } 
 
     pythonProcess2.on('close', () => {
       callbackAfterTwitterCrawler();
