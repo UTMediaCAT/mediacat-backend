@@ -10,7 +10,6 @@ import csv
 import os
 
 
-
 # In[2]:
 
 
@@ -29,7 +28,6 @@ def get_list(file):
     except(Exception):
         print("Input file is not csv or doesn't exist such csv")
         exit(1)
-
 
 # In[42]:
 
@@ -62,22 +60,34 @@ def mini_processor(name, tag):
         print(e)
         pass
 
+
 def add_headers():
     """
     add correct headers to twitter csv files.
     """
     path = './csv/'
-    for file_name in [file for file in os.listdir(path) if file.endswith('.csv')]:
+    for file_name in [file for file in os.listdir(path) if file.endswith('.csv')]:  # nopep8
         try:
             df = pd.read_csv(path + file_name, header=None, low_memory=False)
-            df.to_csv("csv/" + file_name, header=["id","conversation_id","created_at","date","time","timezone","user_id","username","name","place","tweet","language","mentions","urls","photos","replies_count","retweets_count","likes_count","hashtags","cashtags","link","retweet","quote_url","video","thumbnail","near","geo","source","user_rt_id","user_rt","retweet_id","reply_to","retweet_date","translate","trans_src","trans_dest"], index=False)
+            df.to_csv("csv/" + file_name,
+                      header=["id", "conversation_id", "created_at", "date",
+                              "time", "timezone", "user_id", "username",
+                              "name", "place", "tweet", "language",
+                              "mentions", "urls", "photos", "replies_count",
+                              "retweets_count", "likes_count", "hashtags",
+                              "cashtags", "link", "retweet", "quote_url",
+                              "video", "thumbnail", "near", "geo", "source",
+                              "user_rt_id", "user_rt", "retweet_id",
+                              "reply_to", "retweet_date", "translate",
+                              "trans_src", "trans_dest"], index=False)
         except pd.errors.EmptyDataError:
             print("Empty File: " + file_name)
             pass
 
+
 def pre_processer(file):
     (list_name, tags) = get_list(file)
-    #add_headers()
+    # add_headers()
     for i in range(len(list_name)):
         txtname = list_name[i].split('@')[1]
         mini_processor(txtname, tags[i])
