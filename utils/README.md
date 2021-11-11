@@ -7,3 +7,9 @@ The Archive API must be enabled on the user's Developer Portal to use this scrip
 
 This script is provided as a way to validate article counts from the NYT on the MediaCAT project, as the output CSVs can be filtered by their ```subsection``` column to obtain counts for articles on a specific topic.
 This script is adapted from [this guide](https://towardsdatascience.com/collecting-data-from-the-new-york-times-over-any-period-of-time-3e365504004).
+
+## Insert_missing_dates.py
+This scripts operates on the file created by post-proccesso-to-csv and fills in missing publication date for news articles. If the date of publication is present in the csv, it will keep it.
+
+Currently the number of lines read (`limit`) and input size for each thread (`thread_input_size`) are hardcoded
+
