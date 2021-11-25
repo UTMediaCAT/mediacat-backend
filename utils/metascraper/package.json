@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "got": "^11.8.3",
+    "metascraper": "^5.25.2",
+    "metascraper-author": "^5.25.2",
+    "metascraper-date": "^5.25.2",
+    "metascraper-title": "^5.25.2"
+  }
+}
