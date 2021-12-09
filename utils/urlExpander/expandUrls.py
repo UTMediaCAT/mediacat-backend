@@ -66,9 +66,10 @@ if __name__ == '__main__':
     """
     # change num_procs to the desired number of processes, 
     # ideally, this should be equal to the number CSV files if possible
-    num_procs = 650
+    num_procs = int(sys.argv[3])
     i = 0
     source = sys.arv[1] if sys.argv[1].endswith('/') else sys.argv[1] + '/'
+    print('Running with', num_procs, 'processes')
     assignments = {k: [] for k in range(num_procs)}
     for f in os.listdir(source):
         assignments[i%num_procs].append(f)
