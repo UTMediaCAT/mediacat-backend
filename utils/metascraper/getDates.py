@@ -8,9 +8,18 @@ for f in os.listdir(sys.argv[1]):
         d = json.loads(json_file.read())
 
         results = os.popen('node dates.js ' + d['url']).read().split('\n')
-        date = results[0]
-        author = results[1]
-        title = results[2]
+        try:
+            date = results[0]
+        except Exception:
+            date = ""
+        try:
+            author = results[1]
+        except Exception:
+            author = ""
+        try:
+            title = results[2]
+        except Exception:
+            title = ""
         if date != 'null' and len(date) > 0:
             d['date'] = date
         if author != 'null' and len(author) > 0:
