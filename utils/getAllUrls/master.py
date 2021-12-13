@@ -8,7 +8,7 @@ proc = subprocess.Popen("python3 getURLs.py " + sys.argv[1], shell=True)
 runtime = 30
 #keep restarting up the processes as soon as they quit
 while True:
-    if len(os.listdir('./DomainOutput')) == 0:
+    if len(os.listdir(sys.argv[1])) == 0:
         #all files have been processed, exit
         exit(0)
     poll = proc.poll()
