@@ -6,6 +6,8 @@
 cd Post-Processor
 python3 processor.py
 ```
+### Advanced Usage
+The post-processor also supports multi-processing for more efficient performance, to utilize this feature, run `python3 processor.py -num_procs=x -limit=y` where `x` is the number of processes to use and `y` is the memory limit (in bytes) of the local data after which it will be written to disk. Increasing `-limit` will prevent memory errors but may reduce performance speed. Recommended usage: `python3 processor.py -num_procs=10 -limit=5000000`
 
 Required files and folder structure within Post-Processor directory:
 - DomainOutput: holds all domain crawler output files
@@ -14,6 +16,9 @@ Required files and folder structure within Post-Processor directory:
 - Output: a folder to hold the output of the processor, including output.json and interest_output.json (can be empty prior to running)
 - Saved: a folder to hold saved intermediate states of files (can be empty)
 - logs: a folder to hold logs (can be empty)
+- tempFiles: a folder to hold all the temporary referral files created, must contain the two following sub-directories
+    - Domain: for temporary domain files
+    - Twitter: for temporary twitter files
 
 The output from the previous run of the processor is in /Post-Processor/output.json
 
