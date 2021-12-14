@@ -4,11 +4,8 @@ import sys
 from multiprocessing import Process, Manager
 def getDate(f):
 
-#for f in os.listdir(sys.argv[1]):
-    '''
-    if i == 10:
-        break
-    '''
+    if f.split('/')[-1] in os.listdir('./DatedOutput/'): #skip completed files
+        return
     with open(f, 'r') as json_file:
         d = json.loads(json_file.read())
 
