@@ -2,6 +2,7 @@
 # mediacat-backend
 
 ## Post Processor Usage
+**Before running, make sure to remove the testing files from the `DomainOutput` and `TwitterOutput` directories**
 ```
 cd Post-Processor
 python3 processor.py
