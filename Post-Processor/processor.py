@@ -645,7 +645,10 @@ def generateNode(url, result):
         result: a dictionary to store the URL-node pair
     """
     # domain = tldextract.extract(url)[1]#urlparse(url).netloc
-    path = urlparse(url).path
+    try:
+        path = urlparse(url).path
+    except Exception:
+        return
     domain = url.replace(path, '')
     result[url] = {'id': str(uuid.uuid5(uuid.NAMESPACE_DNS, url)), 'type': 'domain', 'domain': domain,
                    'url': url, 'article_text': '', 'date': '', 'author_metadata': '', 'language': ''}
