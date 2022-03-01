@@ -531,7 +531,6 @@ def create_csv_title():
     new_file.close()
 
 
-def create_output(article, referrals, scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, final_pairs):
 def create_output(article, referrals, crawl_scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, final_pairs):
     """
     create an row for all URLs in DomainOutput that contain citations or text alias from citation scope in output.csv
