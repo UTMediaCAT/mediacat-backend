@@ -9,6 +9,8 @@ its corresponding information.
 Usage: "python3 processor.py"
 Output: link_title_list.json
 """
+import pandas as pd
+from operator import delitem
 import tldextract
 import json
 import os
@@ -51,11 +53,12 @@ def load_json():
             pairings[data['id']] = {'url': data['url'], 'domain': data['domain']}  # nopep8
     return all_data, pairings
 
+
 def convert_dict(original):
     key_dict = {'urls': 'Found URL', 'hashtags': 'Hashtags', 'link': 'URL to article/Tweet',
-    'id': 'Hit Record Unique ID', 'username': 'Source', 'place': 'Location',
-    'mentions': 'Mentions', 'tweet': 'Plain Text of Article or Tweet', 'date': 'Date',
-    'language': 'Language'}
+                'id': 'Hit Record Unique ID', 'username': 'Source', 'place': 'Location',
+                'mentions': 'Mentions', 'tweet': 'Plain Text of Article or Tweet', 'date': 'Date',
+                'language': 'Language'}
     new_dict = {}
     for key in original:
         if key in key_dict:
@@ -111,8 +114,8 @@ def load_twitter_csv():
                     'article_text': line['Plain Text of Article or Tweet'],
                     'date': line['Date'], 'Mentions': mentions,
                     'Hashtags': hashtags,
-                    'found_urls': lst, 
-                    'name': line['name'], 'reply_count': line['replies_count'], 
+                    'found_urls': lst,
+                    'name': line['name'], 'reply_count': line['replies_count'],
                     'retweet_count': line['retweets_count'], 'like_count': line['likes_count'],
                     'cashtags': cashtags, 'retweet': line['retweet'], 'video': line['video'],
                     'thumbnail': line['thumbnail'], 'reply_to': reply_to}
@@ -161,56 +164,74 @@ def load_scope(file):
     return scope
 
 
-def find_aliases(data, node, scope):
+def find_citation_aliases(data, node, scope):
     '''
-    Finds all the text aliases and twitter handles in this node's text.
-    Returns a list of sources in scope that have been mentioned
-    in this node's text, as well as a list of twitter handles found
-    that are not in the scope.
+    Finds all the in scope citations, text aliases and twitter handles in this node's text.
+    Append keys 'citation url or text alias', 'citation name', and 'anchor text' to the node.
     Parameters:
         data: the data dictionary
         node: the node in the dictionary that we are searching on
         scope: the scope dictionary
-    Returns 2 lists in a tuple:
+    Returns 1 lists:
         - found aliases is a list of all
             the sources that this article node refers to
-        - random tweets is a list of all
-            twitter handles found in the plain text that are not in the scope
     '''
     found_aliases = []
-    twitters = []
-    sequence = data[node]['article_text']
-    for source, info in scope.items():
-        if data[node]['domain'] == source:
-            # ignore self-referrals
-            continue
-        src = [source]
-        pattern = r"(\W|^)(%s)(\W|$)" % "|".join(src)
-        if re.search(pattern, sequence, re.IGNORECASE):
-            found_aliases.append(source)
 
+    citation_url_or_text_alias = []
+    citation_name = []
+    anchor_text = []
+
+    sequence = data[node]['html_content']
+    for source, info in scope.items():
+        # find the in-scope citation url in html_content
+        ext = tldextract.extract(source)
+        if ext[0] == '':
+            domain = ext[1] + '.' + ext[2]
+        else:
+            domain = '.'.join(ext)
+        pattern = r"<a\s+href=([\"'])(http://www.|http://|https://www.)" + \
+            re.escape(domain) + r"/(.*?)([\"'])(.*?)(>)(.*?)(</a>)"
+        matches = re.findall(pattern, sequence, re.IGNORECASE)
+        if matches:
+            for match in matches:
+                citation_url = match[1] + domain + '/' + match[2]
+                # sometime non english article list hyperlink multiple times for a single citation
+                # check duplicate here
+                if not (citation_url in citation_url_or_text_alias):
+                    citation_url_or_text_alias.append(citation_url)
+                    anchor_text.append(match[6])
+                    citation_name.append(info["Name"])
+                if not (source in found_aliases):
+                    found_aliases.append(source)
+
+        # find in-scope aliases in html_content
         if info['aliases']:
             aliases = info['aliases']
-            pattern = r"(?!@)(\W|^)(%s)(\W|$)" % "|".join(aliases)
-            if re.search(pattern, sequence, re.IGNORECASE):
-                found_aliases.append(str(aliases))
+            for i in range(0, len(aliases)):
+                pattern = r"( |\"|')" + re.escape(aliases[i])
+                if re.search(pattern, sequence, re.IGNORECASE):
+                    citation_url_or_text_alias.append(aliases[i])
+                    citation_name.append(info["Name"])
+                    if not (source in found_aliases):
+                        found_aliases.append(source)
 
+        # find twitter_handles in html_content
         if info['twitter_handles']:
             handles = info['twitter_handles']
-            for handle in handles:
-                pattern = r"(\W|^)(%s)(\W|$)" % "|".join(handle)
+            for i in range(0, len(handles)):
+                pattern = r"@" + re.escape(handles[i])
                 if re.search(pattern, sequence, re.IGNORECASE):
-                    found_aliases += handle
+                    citation_url_or_text_alias.append(handles[i])
+                    citation_name.append(info['Name'])
+                    if not (source in found_aliases):
+                        found_aliases.append(source)
 
-    # find all twitter handles in the text
-    pattern = r"(?<=^|(?<=[^a-zA-Z0-9-_\.]))(@[A-Za-z]+[A-Za-z0-9-_]+)"
-    twitters = re.findall(pattern, sequence, re.IGNORECASE)
-    # check these twitter handles arent in the scope,
-    # and save them to random_tweets
-    t = [item for item in twitters if item not in found_aliases]
-    random_tweets = [item for item in t if item not in scope.keys()]
+        data[node]['citation url or text alias'] = citation_url_or_text_alias
+        data[node]['citation name'] = citation_name
+        data[node]['anchor text'] = anchor_text
 
-    return found_aliases, random_tweets
+    return found_aliases
 
 
 def process_twitter(data, scope):
@@ -232,7 +253,8 @@ def process_twitter(data, scope):
         for node in data:
             if data[node]['completed']:
                 continue
-            found_aliases, twitter_handles = find_aliases(data, node, scope)
+            found_aliases, twitter_handles = find_citation_aliases(
+                data, node, scope)
             # each key in links is an article url, and it has a list
             # of article ids that are talking about it
             for link in data[node]['found_urls']:
@@ -283,7 +305,8 @@ def multi_process_twitter(data, scope, assignemnts, referrals_shared=None):
         for node in assignemnts:  # data:
             if data[node]['completed']:
                 continue
-            found_aliases, twitter_handles = find_aliases(data, node, scope)
+            found_aliases, twitter_handles = find_citation_aliases(
+                data, node, scope)
             # each key in links is an article url, and it has a list
             # of article ids that are talking about it
             for link in data[node]['found_urls']:
@@ -360,7 +383,7 @@ def process_domain(data, scope):
         for node in data:
             if data[node]['completed']:
                 continue
-            found_aliases, twitter_handles = find_aliases(data, node, scope)
+            found_aliases = find_citation_aliases(data, node, scope)
             # each key in links is an article url, and it has a list of
             # article ids that are referring it
             for link in data[node]['found_urls']:
@@ -396,7 +419,7 @@ def process_domain(data, scope):
     return data, referrals
 
 
-def multi_process_domain(data, scope, assignments, referrals_shared=None):
+def multi_process_domain(data, domain_data_dicts, scope, assignments, referrals_shared=None):
     """
     Processes the domain data using multi processing by finding all the articles that it is
     referring to and articles that are referring to it and mutating
@@ -418,7 +441,8 @@ def multi_process_domain(data, scope, assignments, referrals_shared=None):
         for node in assignments:  # data:
             if data[node]['completed']:
                 continue
-            found_aliases, twitter_handles = find_aliases(data, node, scope)
+            found_aliases = find_citation_aliases(data, node, scope)
+            domain_data_dicts[node] = data[node]
             # each key in links is an article url, and it has a list of
             # article ids that are referring it
             for link in data[node]['found_urls']:
@@ -478,18 +502,47 @@ def multi_process_domain(data, scope, assignments, referrals_shared=None):
         write_to_file(referrals, "Saved/domain_referrals.json")
         write_to_file(data, "Saved/domain_data.json")
         raise
+
     return data, referrals
 
 
-def create_output(article, referrals, scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, final_pairs):  # nopep8
-    '''
-    Creates the data format for the output json by
-    mutating the output and interest output object.
-    '''
+def create_csv_title():
+    row = (
+        'id',
+        'url',
+        'referring record id',
+        'number of referrals',
+        'type',
+        'associated publisher',
+        'tags',
+        'name',
+        'authors',
+        'date of publication',
+        'plain text',
+        'citation url or text alias',
+        'citation name',
+        'anchor text',
+        'article title'
+    )
+    with open('Output/output.csv', 'a') as new_file:
+        csv_writer = csv.writer(new_file)
+        csv_writer.writerow(row)
 
-    domain = tldextract.extract(article["domain"])[1] if article['type'] == 'domain' else ''
-    if (article["domain"] in scope.keys()) or (domain in domains):
-        # article is in scope
+    new_file.close()
+
+
+def create_output(article, referrals, scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, final_pairs):
+    """
+    create an row for all URLs in DomainOutput that contain citations or text alias from citation scope in output.csv
+    """
+    # check if URL in DomainOutput
+    if article["id"] in domain_pairs.keys():
+        # check if it contains citations or text alias from citation scope
+        if not 'citation url or text alias' in article.keys():
+            return
+        if len(article['citation url or text alias']) == 0:
+            return
+
         for ref in referrals:
             if ref in twitter_pairs:
                 final_pairs[ref] = twitter_pairs[ref]
@@ -503,64 +556,39 @@ def create_output(article, referrals, scope, output, interest_output, domain_pai
         try:
             publisher = scope[article["domain"]]['Publisher']
         except Exception:
-            publisher = scope[domain_to_url[domain]]['Publisher']
+            publisher = ""
         try:
             tags = scope[article["domain"]]['Tags']
         except Exception:
-            tags = scope[domain_to_url[domain]]['Tags']
+            tags = ""
         try:
             name = scope[article["domain"]]['Name']
         except Exception:
-            name = scope[domain_to_url[domain]]['Name']
-        output[article['id']] = {
-                    'id': article['id'],
-                    'url or alias text': article['url'],
-                    'referring record id': referrals,
-                    'number of referrals': len(referrals),
-                    'type': article['type'],
-                    'associated publisher': publisher,  # nopep8
-                    'tags': tags,
-                    'name/title': name,
-                    'language': article["language"],
-                    'authors': article['author_metadata'],
-                    'date of publication': article['date'],
-                    'plain text': article['article_text'],
-                    'image reference': '',
-                    'anchor text': '', }
-    else:
-        # article is not in scope
-        cited = {}
-        for ref_id in referrals:
-            # print(domain_pairs)
-            if ref_id in domain_pairs:
-                try:
-                    cited[domain_pairs[ref_id]['domain']] += 1
-                except Exception:
-                    cited[domain_pairs[ref_id]['domain']] = 1
-            else:
-                try:
-                    cited[twitter_pairs[ref_id]['domain']] += 1
-                except Exception:
-                    cited[twitter_pairs[ref_id]['domain']] = 1
-        # sort top referring domains by number of hits descending
-        top = dict(sorted(cited.items(), key=lambda item: item[1], reverse=True))  # nopep8
+            name = ""
 
-        # top referrals gets the top 5 domains that
-        # referred to this article the most
-        interest_output[article['id']] = {
-            'id': article['id'],
-            'hit count': len(referrals),
-            'url or alias text': article['url'],
-            'source': article['domain'],
-            'name': '',
-                    'tags': [],
-                    'publisher': '',
-                    'referring record id': referrals,
-                    'authors': article['author_metadata'],
-                    'plain text': article['article_text'],
-                    'type': article['type'],
-                    'date of publication': article['date'],
-                    'top referrals': dict(itertools.islice(top.items(), 5))}
+        row = (
+            article['id'],
+            article['url'],
+            referrals,
+            len(referrals),
+            article['type'],
+            publisher,
+            tags,
+            name,
+            article['author_metascraper'],
+            article['date'],
+            article['article_text'],
+            article['citation url or text alias'],
+            article['citation name'],
+            article['anchor text'],
+            article['title_metascraper']
+        )
+
+        with open('Output/output.csv', 'a') as new_file:
+            csv_writer = csv.writer(new_file)
+            csv_writer.writerow(row)
+
+        new_file.close()
 
 
 def parse_referrals(article, domain_referrals, twitter_referrals):
@@ -649,6 +677,8 @@ def generateNode(url, result):
         path = urlparse(url).path
     except Exception:
         return
+    if url == None:
+        return
     domain = url.replace(path, '')
     result[url] = {'id': str(uuid.uuid5(uuid.NAMESPACE_DNS, url)), 'type': 'domain', 'domain': domain,
                    'url': url, 'article_text': '', 'date': '', 'author_metadata': '', 'language': ''}
@@ -696,9 +726,12 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
             for proc in range(num_procs):
                 domain_dicts[proc] = managerDomain.dict()
 
+        # initailize domain_data_dicts as a shared dict to store modified domain data
+        domain_data_dicts = managerDomain.dict()
+
         for proc in range(num_procs):
             domain_procs[proc] = Process(target=multi_process_domain, args=(
-                domain_data, scope, assignments[proc], domain_dicts[proc], ))
+                domain_data, domain_data_dicts, scope, assignments[proc], domain_dicts[proc], ))
             domain_procs[proc].start()
 
         ##### INITIALIZE TWITTER PROCESSES #####
@@ -724,6 +757,8 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
             domain_procs[proc].join()
             if MEM_LIMIT == -1:  # merge from memory
                 merge_referals(domain_dicts[proc], domain_referrals)
+        # update domain_data after multi_process_domain
+        domain_data = domain_data_dicts.copy()
 
         if MEM_LIMIT > 0:  # merge from disk files
             mergeFiles('./tempFiles/Domain/', domain_referrals)
@@ -761,7 +796,6 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
     """
     # create static nodes
 
-
     print('creating static nodes')
     nodes = create_static_nodes(scope)
     # add these nodes to domain_data, prioritize domain_data if duplications
@@ -776,13 +810,14 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
     domains = []
     domain_to_url = {}
     id_to_tweet = {}
+    create_csv_title()
 
     for url in scope.keys():
         if not url.startswith('@'):
             curr_dom = tldextract.extract(url)[1]
             domains.append(curr_dom)
             domain_to_url[curr_dom] = url
-    #create output for articles found in 'found_urls' of twitter data
+    # create output for articles found in 'found_urls' of twitter data
     twitter_urls = {}
     for link in twitter_referrals:
         if link in twitter_data or link in domain_data:
@@ -794,17 +829,18 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
         create_output(twitter_urls[val], referring_articles, scope, output,
                       interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, id_to_tweet)
 
-    #create output for articles found in 'found_urls' of domain data
+    # create output for articles found in 'found_urls' of domain data
     domain_urls = {}
     for link in domain_referrals:
         if link in domain_data or link in twitter_data:
             continue
         generateNode(link, domain_urls)
     for url in domain_urls:
-        referring_articles = parse_referrals(domain_urls[url], domain_referrals, twitter_referrals)
-        create_output(domain_urls[url], referring_articles, scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, id_to_tweet)
+        referring_articles = parse_referrals(
+            domain_urls[url], domain_referrals, twitter_referrals)
+        create_output(domain_urls[url], referring_articles, scope, output, interest_output,
+                      domain_pairs, twitter_pairs, domains, domain_to_url, id_to_tweet)
 
-    
     for node in domain_data:
         referring_articles = parse_referrals(domain_data[node], domain_referrals, twitter_referrals)  # nopep8
         create_output(domain_data[node], referring_articles, scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, id_to_tweet)  # nopep8
@@ -821,12 +857,12 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
     logging.info("Output " + str(len(output)) + " articles in scope and " +
                  str(len(interest_output)) + " articles in interest scope")
     start = timer()
-    write_to_file(id_to_tweet, 'id_to_tweet.json')
+    # write_to_file(id_to_tweet, 'id_to_tweet.json')
     # write final output to file
-    write_to_file(output, "Output/output.json")
+    # write_to_file(output, "Output/output.json")
     # Sorts interest output
-    interest_output = dict(sorted(interest_output.items(), key=lambda item: item[1]['hit count'], reverse=True))  # nopep8
-    write_to_file(interest_output, "Output/interest_output.json")
+    # interest_output = dict(sorted(interest_output.items(), key=lambda item: item[1]['hit count'], reverse=True))  # nopep8
+    # write_to_file(interest_output, "Output/interest_output.json")
 
     end = timer()
     logging.info("Serializing and writing final json output - Took " + str(end - start) + " seconds")  # nopep8
@@ -939,6 +975,7 @@ def parse_args():
             elif spec == '-limit':
                 MEM_LIMIT = val
 
+
 if __name__ == '__main__':
     # change this flag to true if restarting after a break,
     # and want to use saved data.
@@ -950,7 +987,7 @@ if __name__ == '__main__':
     start = timer()
     scope_timer = timer()
     # load scope
-    scope = load_scope('./input_scope_final.csv')
+    scope = load_scope('./citation_scope.csv')
 
     scope_timer_end = timer()
 
@@ -966,6 +1003,8 @@ if __name__ == '__main__':
     # load domain data
     domain_data, domain_pairs = load_json()
 
+    logging.info("finished loading data")
+
     domain_timer_end = timer()
     if read_from_memory:
         # read saved data into memory
@@ -978,6 +1017,11 @@ if __name__ == '__main__':
                         scope, domain_pairs, twitter_pairs)
     end = timer()
     # Time in seconds
+
+    # Convert output.csv to output.xlsx
+    df = pd.read_csv('Output/output.csv')
+    df.to_excel('Output/output.xlsx')
+
     logging.info("Time to run whole post-processor took " + str(end - start) + " seconds")  # nopep8
     logging.info("Time to read scope took " + str(scope_timer_end - scope_timer) + " seconds")  # nopep8
     logging.info("Time to read twitter files took " + str(twitter_timer_end - twitter_timer) + " seconds")  # nopep8
