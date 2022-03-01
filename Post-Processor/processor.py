@@ -532,11 +532,12 @@ def create_csv_title():
 
 
 def create_output(article, referrals, scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, final_pairs):
+def create_output(article, referrals, crawl_scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, final_pairs):
     """
     create an row for all URLs in DomainOutput that contain citations or text alias from citation scope in output.csv
     """
     # check if URL in DomainOutput
-    if article["id"] in domain_pairs.keys():
+    if article["id"] in domain_pairs.keys() and article["domain"] in crawl_scope.keys():
         # check if it contains citations or text alias from citation scope
         if not 'citation url or text alias' in article.keys():
             return
@@ -554,15 +555,15 @@ def create_output(article, referrals, scope, output, interest_output, domain_pai
             # in output if referral count is 0.
             return
         try:
-            publisher = scope[article["domain"]]['Publisher']
+            publisher = crawl_scope[article["domain"]]['Publisher']
         except Exception:
             publisher = ""
         try:
-            tags = scope[article["domain"]]['Tags']
+            tags = crawl_scope[article["domain"]]['Tags']
         except Exception:
             tags = ""
         try:
-            name = scope[article["domain"]]['Name']
+            name = crawl_scope[article["domain"]]['Name']
         except Exception:
             name = ""
 
@@ -684,7 +685,7 @@ def generateNode(url, result):
                    'url': url, 'article_text': '', 'date': '', 'author_metadata': '', 'language': ''}
 
 
-def process_crawler(domain_data, twitter_data, scope, domain_pairs,
+def process_crawler(domain_data, twitter_data, crawl_scope, citation_scope, domain_pairs,
                     twitter_pairs, saved_domain_referrals={},
                     saved_twitter_referrals={}):
     """
@@ -707,9 +708,10 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
     interest_output = {}
     # get a dictionary of all the referrals for each source
     if NUM_PROCS == -1 and MEM_LIMIT == -1:  # run normally w/o multiprocessing
-        domain_data, domain_referrals = (process_domain(domain_data, scope))
+        domain_data, domain_referrals = (
+            process_domain(domain_data, citation_scope))
         twitter_data, twitter_referrals = (
-            process_twitter(twitter_data, scope))
+            process_twitter(twitter_data, citation_scope))
     elif NUM_PROCS > 0:  # multiprocessing
         num_procs = NUM_PROCS
         ##### INITIALIZE DOMAIN PROCESSES #####
@@ -731,7 +733,7 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
 
         for proc in range(num_procs):
             domain_procs[proc] = Process(target=multi_process_domain, args=(
-                domain_data, domain_data_dicts, scope, assignments[proc], domain_dicts[proc], ))
+                domain_data, domain_data_dicts, citation_scope, assignments[proc], domain_dicts[proc], ))
             domain_procs[proc].start()
 
         ##### INITIALIZE TWITTER PROCESSES #####
@@ -749,7 +751,7 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
         twit_procs = [None] * num_procs
         for h in range(num_procs):
             twit_procs[h] = Process(target=multi_process_twitter, args=(
-                twitter_data, scope, assignmentsTwitter[h], twit_procs[proc], ))
+                twitter_data, citation_scope, assignmentsTwitter[h], twit_procs[proc], ))
             twit_procs[h].start()
 
         ##### JOIN DOMAIN PROCESSES #####
@@ -797,7 +799,7 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
     # create static nodes
 
     print('creating static nodes')
-    nodes = create_static_nodes(scope)
+    nodes = create_static_nodes(citation_scope)
     # add these nodes to domain_data, prioritize domain_data if duplications
     nodes.update(domain_data)
     domain_data = nodes
@@ -812,7 +814,7 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
     id_to_tweet = {}
     create_csv_title()
 
-    for url in scope.keys():
+    for url in citation_scope.keys():
         if not url.startswith('@'):
             curr_dom = tldextract.extract(url)[1]
             domains.append(curr_dom)
@@ -826,7 +828,7 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
     for val in twitter_urls:
         referring_articles = parse_referrals(
             twitter_urls[val], domain_referrals, twitter_referrals)
-        create_output(twitter_urls[val], referring_articles, scope, output,
+        create_output(twitter_urls[val], referring_articles, crawl_scope, output,
                       interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, id_to_tweet)
 
     # create output for articles found in 'found_urls' of domain data
@@ -838,12 +840,12 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
     for url in domain_urls:
         referring_articles = parse_referrals(
             domain_urls[url], domain_referrals, twitter_referrals)
-        create_output(domain_urls[url], referring_articles, scope, output, interest_output,
+        create_output(domain_urls[url], referring_articles, crawl_scope, output, interest_output,
                       domain_pairs, twitter_pairs, domains, domain_to_url, id_to_tweet)
 
     for node in domain_data:
         referring_articles = parse_referrals(domain_data[node], domain_referrals, twitter_referrals)  # nopep8
-        create_output(domain_data[node], referring_articles, scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, id_to_tweet)  # nopep8
+        create_output(domain_data[node], referring_articles, crawl_scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, id_to_tweet)  # nopep8
     end = timer()
     logging.info("Parsing domain output file - Took " + str(end - start) + " seconds")  # nopep8
 
@@ -851,7 +853,7 @@ def process_crawler(domain_data, twitter_data, scope, domain_pairs,
     print('cross match between twitter and domain data ')
     for node in twitter_data:
         referring_articles = parse_referrals(twitter_data[node], domain_referrals, twitter_referrals)  # nopep8
-        create_output(twitter_data[node], referring_articles, scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, id_to_tweet)  # nopep8
+        create_output(twitter_data[node], referring_articles, crawl_scope, output, interest_output, domain_pairs, twitter_pairs, domains, domain_to_url, id_to_tweet)  # nopep8
     end = timer()
     logging.info("Parsing twitter output file - Took " + str(end - start) + " seconds")  # nopep8
     logging.info("Output " + str(len(output)) + " articles in scope and " +
@@ -986,8 +988,9 @@ if __name__ == '__main__':
 
     start = timer()
     scope_timer = timer()
-    # load scope
-    scope = load_scope('./citation_scope.csv')
+    # load scopes
+    crawl_scope = load_scope('./crawl_scope.csv')
+    citation_scope = load_scope('./citaion_scope.csv')
 
     scope_timer_end = timer()
 
@@ -1010,11 +1013,11 @@ if __name__ == '__main__':
         # read saved data into memory
         domain_data, twitter_data, domain_referrals, twitter_referrals = load_saved_files()  # nopep8
         process_crawler(domain_data, twitter_data,
-                        scope, domain_pairs, twitter_pairs,
+                        crawl_scope, citation_scope, domain_pairs, twitter_pairs,
                         domain_referrals, twitter_referrals)
     else:
         process_crawler(domain_data, twitter_data,
-                        scope, domain_pairs, twitter_pairs)
+                        crawl_scope, citation_scope, domain_pairs, twitter_pairs)
     end = timer()
     # Time in seconds
 
