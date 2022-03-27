@@ -190,7 +190,7 @@ def find_citation_aliases(data, node, scope):
             domain = ext[1] + '.' + ext[2]
         else:
             domain = '.'.join(ext)
-        pattern = r"<a\s+href=([\"'])(http://www.|http://|https://www.)" + \
+        pattern = r"<a\s+href=([\"'])(http://www.|http://|https://www.|https://)" + \
             re.escape(domain) + r"/(.*?)([\"'])(.*?)(>)(.*?)(</a>)"
         matches = re.findall(pattern, sequence, re.IGNORECASE)
         if matches:
