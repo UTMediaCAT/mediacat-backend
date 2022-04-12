@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 
 url = process.argv[2];
+let url = process.argv[2];
 
 (async function main() {
     try {

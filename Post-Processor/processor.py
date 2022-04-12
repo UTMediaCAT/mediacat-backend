@@ -55,18 +55,15 @@ def load_json():
 
 
 def convert_dict(original):
-    key_dict = {'urls': 'Found URL', 'hashtags': 'Hashtags', 'link': 'URL to article/Tweet',
-                'id': 'Hit Record Unique ID', 'username': 'Source', 'place': 'Location',
-                'mentions': 'Mentions', 'tweet': 'Plain Text of Article or Tweet', 'date': 'Date',
-                'language': 'Language'}
+    key_dict = {'tags': 'Hashtags', 'tweet_url': 'url', 'twitter_handle': 'Source', 'place': 'geo', 'text': 'Plain Text of Article or Tweet', 'created_at': 'Date',
+                'lang': 'Language'}
     new_dict = {}
     for key in original:
         if key in key_dict:
             new_dict[key_dict[key]] = original[key]
         else:
             new_dict[key] = original[key]
-    new_dict['Hit Type'] = 'Twitter Hanlde'
-    new_dict['Passed through tags'] = ''
+    new_dict['Type'] = 'Twitter Hanlde'
     new_dict['Associated Publisher'] = ''
     new_dict['Authors'] = ''
     return new_dict
@@ -82,56 +79,47 @@ def load_twitter_csv():
     pairings = {}
     path = './TwitterOutput/'
     for file_name in [file for file in os.listdir(path) if file.endswith('.csv')]:  # nopep8
+        print(file_name)
         with open(path + file_name, mode='r', encoding='utf-8-sig') as csv_file:  # nopep8
             for line in csv.DictReader(csv_file):
                 line = convert_dict(line)
-                if not(line['Found URL'] and line['Hashtags'] and line['Mentions']):  # nopep8
-                    logging.warning("Line format not properly formed :" + line['URL to article/Tweet'] + line['Hit Record Unique ID'])  # nopep8
-                    continue
-                else:
-                    try:
-                        lst = ast.literal_eval(line['Found URL'])
-                        hashtags = ast.literal_eval(line['Hashtags'])
-                        mentions = ast.literal_eval(line['Mentions'])
-                        cashtags = ast.literal_eval(line['cashtags'])
-                        reply_to = ast.literal_eval(line['reply_to'])
-                    except Exception:
-                        logging.warning("Line format not properly formed :" + line['URL to article/Tweet'] + line['Hit Record Unique ID'])  # nopep8
+                try:
+                    entities = ast.literal_eval(line['entities'])
+                except(Exception):
+                    print("Missing entities for twitter.csv", line['url'])
+                    entities = {}
 
                 try:
-                    language = line['Language']
-                except Exception:
-                    language = ""
-                #pairings[line['Hit Record Unique ID']] = {'url': line['URL to article/Tweet'], 'domain': line['Source']}  # nopep8
-                pairings[line['Hit Record Unique ID']] = {
-                    'url': line['URL to article/Tweet'],
-                    'domain': line['Source'], 'Location': line['Location'],
+                    found_urls = ast.literal_eval(line['citation_urls'])
+                except(Exception):
+                    print("Missing urls for twitter.csv", line['url'])
+                    found_urls = []
+
+                Mentions = []
+                if ('mentions' in entities.keys()):
+                    for mention in entities['mentions']:
+                        Mentions.append(mention['username'])
+                uid = str(uuid.uuid5(uuid.NAMESPACE_DNS, line['url']))
+
+                data[line['url']] = {
+                    'url': line['url'],
+                    'id': uid,     # this is the unique id assinged by post_processor, not the twitter id
+                    'domain': line['Source'],
                     'type': "twitter",
-                    'Tags': line['Passed through tags'],
-                    "language": language,
+                    'Tags': line['Hashtags'],
+                    "language": line['Language'],
                     'Associated Publisher': line['Associated Publisher'],
-                    'author_metadata': line['Authors'],
+                    'author_metascraper': line['Authors'],
                     'article_text': line['Plain Text of Article or Tweet'],
-                    'date': line['Date'], 'Mentions': mentions,
-                    'Hashtags': hashtags,
-                    'found_urls': lst,
-                    'name': line['name'], 'reply_count': line['replies_count'],
-                    'retweet_count': line['retweets_count'], 'like_count': line['likes_count'],
-                    'cashtags': cashtags, 'retweet': line['retweet'], 'video': line['video'],
-                    'thumbnail': line['thumbnail'], 'reply_to': reply_to}
-                data[line['URL to article/Tweet']] = {
-                    'url': line['URL to article/Tweet'],
-                    'id': line['Hit Record Unique ID'],
-                    'domain': line['Source'], 'Location': line['Location'],
-                    'type': "twitter",
-                    'Tags': line['Passed through tags'],
-                    "language": language,
-                    'Associated Publisher': line['Associated Publisher'],
-                    'author_metadata': line['Authors'],
-                    'article_text': line['Plain Text of Article or Tweet'],
-                    'date': line['Date'], 'Mentions': mentions,
-                    'Hashtags': hashtags,
-                    'found_urls': lst, 'completed': False}
+                    'date': line['Date'],
+                    'Mentions': Mentions,
+                    'found_urls': found_urls,
+                    'title_metascraper': '',
+                    'completed': False}
+
+                pairings[uid] = {'url': line['url'],
+                                 'twitter_handle': line['Source']}
+        csv_file.close()
     return data, pairings
 
 
@@ -153,10 +141,19 @@ def load_scope(file):
                 twitter = line['Associated Twitter Handle'].split('|')
             if line['Tags'] != " " and line['Tags']:
                 tags = line['Tags'].split('|')
-            scope[line['Source']] = {'Name': line['Name'],
-                                     'RSS': line['RSS feed URLs (where available)'],  # nopep8
+            try:
+                publisher = line['Associated Publisher']
+            except(Exception):
+                publisher = ''
+            try:
+                source = line['Source']
+            except(Exception):
+                source = str(uuid.uuid5(
+                    uuid.NAMESPACE_DNS, line['Name']))
+            scope[source] = {'Name': line['Name'],
+                                    #  'RSS': line['RSS feed URLs (where available)'],  # nopep8
                                      'Type': line['Type'],
-                                     'Publisher': line['Associated Publisher'],
+                                     'Publisher': publisher,
                                      'Tags': tags,
                                      'aliases': aliases,
                                      'twitter_handles': twitter}
@@ -164,7 +161,7 @@ def load_scope(file):
     return scope
 
 
-def find_citation_aliases(data, node, scope):
+def find_domain_citation_aliases(data, node, scope):
     '''
     Finds all the in scope citations, text aliases and twitter handles in this node's text.
     Append keys 'citation url or text alias', 'citation name', and 'anchor text' to the node.
@@ -209,7 +206,7 @@ def find_citation_aliases(data, node, scope):
         if info['aliases']:
             aliases = info['aliases']
             for i in range(0, len(aliases)):
-                pattern = r"( |\"|')" + re.escape(aliases[i])
+                pattern = r"( |\"|')" + re.escape(aliases[i]) + r"( |\"|')"
                 if re.search(pattern, sequence, re.IGNORECASE):
                     citation_url_or_text_alias.append(aliases[i])
                     citation_name.append(info["Name"])
@@ -234,6 +231,64 @@ def find_citation_aliases(data, node, scope):
     return found_aliases
 
 
+def find_twitter_citation_aliases(data, node, scope):
+    found_aliases = []
+    citation_url_or_text_alias = []
+    citation_name = []
+
+    for source, info in scope.items():
+
+        # find all url with domain matching scope
+        if 'http' in source:
+            ext = tldextract.extract(source)
+            if ext[0] == '':
+                domain = ext[1] + '.' + ext[2] + '/'
+            else:
+                domain = '.'.join(ext) + '/'
+
+            for url in data[node]['found_urls']:
+                if domain in url:
+                    citation_url_or_text_alias.append(url)
+                    citation_name.append(info['Name'])
+                    if not (source in found_aliases):
+                        found_aliases.append(source)
+
+        for url in data[node]['found_urls']:
+            for twitter_handle in info['twitter_handles']:
+                twitter_url = 'https://twitter.com/' + \
+                    twitter_handle.replace('@', '') + '/'
+                if twitter_url in url and not (url in citation_url_or_text_alias):
+                    citation_url_or_text_alias.append(url)
+                    citation_name.append(info['Name'])
+                    if not (source in found_aliases):
+                        found_aliases.append(source)
+
+        # find all matching mentions of the tweet
+        for mention in data[node]['Mentions']:
+            for twitter_handle in info['twitter_handles']:
+                if twitter_handle.replace('@', '').lower() == mention.lower():
+                    citation_url_or_text_alias.append(twitter_handle)
+                    citation_name.append(info['Name'])
+                    if not (source in found_aliases):
+                        found_aliases.append(source)
+
+        # find all matching text aliases of the tweet text
+        aliases = info['aliases']
+        for i in range(0, len(aliases)):
+            pattern = r"( |\"|')" + re.escape(aliases[i])
+            if re.search(pattern, data[node]['article_text'], re.IGNORECASE) and not (aliases[i] in citation_url_or_text_alias):
+                citation_url_or_text_alias.append(aliases[i])
+                citation_name.append(info["Name"])
+                if not (source in found_aliases):
+                    found_aliases.append(source)
+
+    data[node]['citation url or text alias'] = citation_url_or_text_alias
+    data[node]['citation name'] = citation_name
+    data[node]['anchor text'] = []
+
+    return found_aliases
+
+
 def process_twitter(data, scope):
     """
     Processes the twitter data by finding all the articles
@@ -253,7 +308,7 @@ def process_twitter(data, scope):
         for node in data:
             if data[node]['completed']:
                 continue
-            found_aliases, twitter_handles = find_citation_aliases(
+            found_aliases = find_twitter_citation_aliases(
                 data, node, scope)
             # each key in links is an article url, and it has a list
             # of article ids that are talking about it
@@ -305,7 +360,7 @@ def multi_process_twitter(data, scope, assignemnts, referrals_shared=None):
         for node in assignemnts:  # data:
             if data[node]['completed']:
                 continue
-            found_aliases, twitter_handles = find_citation_aliases(
+            found_aliases, twitter_handles = find_twitter_citation_aliases(
                 data, node, scope)
             # each key in links is an article url, and it has a list
             # of article ids that are talking about it
@@ -383,7 +438,7 @@ def process_domain(data, scope):
         for node in data:
             if data[node]['completed']:
                 continue
-            found_aliases = find_citation_aliases(data, node, scope)
+            found_aliases = find_domain_citation_aliases(data, node, scope)
             # each key in links is an article url, and it has a list of
             # article ids that are referring it
             for link in data[node]['found_urls']:
@@ -441,7 +496,7 @@ def multi_process_domain(data, domain_data_dicts, scope, assignments, referrals_
         for node in assignments:  # data:
             if data[node]['completed']:
                 continue
-            found_aliases = find_citation_aliases(data, node, scope)
+            found_aliases = find_domain_citation_aliases(data, node, scope)
             domain_data_dicts[node] = data[node]
             # each key in links is an article url, and it has a list of
             # article ids that are referring it
@@ -536,7 +591,7 @@ def create_output(article, referrals, crawl_scope, output, interest_output, doma
     create an row for all URLs in DomainOutput that contain citations or text alias from citation scope in output.csv
     """
     # check if URL in DomainOutput
-    if article["id"] in domain_pairs.keys() and article["domain"] in crawl_scope.keys():
+    if (article["id"] in domain_pairs.keys() and article["domain"] in crawl_scope.keys()) or (article['id'] in twitter_pairs.keys()):
         # check if it contains citations or text alias from citation scope
         if not 'citation url or text alias' in article.keys():
             return
@@ -1022,6 +1077,8 @@ if __name__ == '__main__':
 
     # Convert output.csv to output.xlsx
     df = pd.read_csv('Output/output.csv')
+    df = df.applymap(lambda x: x.encode('unicode_escape').decode(
+        'utf-8') if isinstance(x, str) else x)
     df.to_excel('Output/output.xlsx')
 
     logging.info("Time to run whole post-processor took " + str(end - start) + " seconds")  # nopep8
