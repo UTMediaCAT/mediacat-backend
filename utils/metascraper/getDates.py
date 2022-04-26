@@ -1,6 +1,8 @@
 from cgitb import html
 import os
 import json
+import subprocess
+from socket import timeout
 import sys
 from multiprocessing import Process, Manager
 
@@ -12,8 +14,15 @@ def getDate(f):
     with open(f, 'r') as json_file:
         d = json.loads(json_file.read())
 
-        results = os.popen('node dates.js ' +
-                           d['url']).read().split("\nsplit\nsplit\n")
+        try:
+            proc = subprocess.Popen(['node', 'dates.js',
+                                     d['url']], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='')
+
+            results = proc.communicate(timeout=5)[0].decode(
+                'utf8').split("\nsplit\nsplit\n")
+        except Exception:
+            results = ['', '', '', '', '']
+
         try:
             date = results[0]
         except Exception:
@@ -55,7 +64,7 @@ def init(files):
 
 
 if __name__ == '__main__':
-    num_procs = 40
+    num_procs = 16
     process_index = 0
     assignments = {k: [] for k in range(num_procs)}
     for f in os.listdir(sys.argv[1]):

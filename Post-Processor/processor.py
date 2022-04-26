@@ -206,7 +206,7 @@ def find_domain_citation_aliases(data, node, scope):
         if info['aliases']:
             aliases = info['aliases']
             for i in range(0, len(aliases)):
-                pattern = r"( |\"|')" + re.escape(aliases[i]) + r"( |\"|')"
+                pattern = r"( |\"|')" + re.escape(aliases[i]) + r"( |\"|'|,)"
                 if re.search(pattern, sequence, re.IGNORECASE):
                     citation_url_or_text_alias.append(aliases[i])
                     citation_name.append(info["Name"])
@@ -275,7 +275,7 @@ def find_twitter_citation_aliases(data, node, scope):
         # find all matching text aliases of the tweet text
         aliases = info['aliases']
         for i in range(0, len(aliases)):
-            pattern = r"( |\"|')" + re.escape(aliases[i])
+            pattern = r"( |\"|')" + re.escape(aliases[i]) + r"( |\"|'|,)"
             if re.search(pattern, data[node]['article_text'], re.IGNORECASE) and not (aliases[i] in citation_url_or_text_alias):
                 citation_url_or_text_alias.append(aliases[i])
                 citation_name.append(info["Name"])

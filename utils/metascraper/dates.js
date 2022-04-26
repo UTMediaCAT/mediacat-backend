@@ -38,29 +38,31 @@ const targetUrl = process.argv[2];;
             console.log("N/A")
             console.log("split\nsplit")
         }
-        setTimeout(function () {
-            try {
-                var doc = new JSDOM(html, {
-                    url: url
-                });
-                if (isProbablyReaderable(doc.window.document)) {
-                    let reader = new Readability(doc.window.document);
-                    let article = reader.parse();
-                    console.log(article.content)
-                    console.log("split\nsplit")
-                    console.log(article.textContent)
-                } else {
-                    console.log("not readable")
-                    console.log("split\nsplit")
-                    console.log("not readable")
-                }
-            } catch (error) {
-                // console.log(error)
-                console.log("article.content")
+        try {
+            // timer = setTimeout(() => {
+            //     process.exit(1)
+            // }, 5000);
+            var doc = new JSDOM(html, {
+                url: url
+            });
+            if (isProbablyReaderable(doc.window.document)) {
+                let reader = new Readability(doc.window.document);
+                let article = reader.parse();
+                console.log(article.content)
                 console.log("split\nsplit")
-                console.log("article.textContent")
+                console.log(article.textContent)
+            } else {
+                console.log("not readable")
+                console.log("split\nsplit")
+                console.log("not readable")
             }
-        }, 1000)
+            // clearTimeout(timer)
+        } catch (error) {
+            // console.log(error)
+            console.log("article.content")
+            console.log("split\nsplit")
+            console.log("article.textContent")
+        }
     } catch (error) {
         console.log("N/A")
         console.log("split\nsplit")
@@ -72,5 +74,4 @@ const targetUrl = process.argv[2];;
         console.log("split\nsplit")
         console.log("article.textContent")
     }
-
 })()
