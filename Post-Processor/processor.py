@@ -24,7 +24,6 @@ import logging
 import sys
 import gc
 from multiprocessing import Process, Manager
-import urlexpander
 from urllib.parse import urlparse
 logging.basicConfig(filename='./logs/processor.log', level=logging.DEBUG, filemode='w')  # nopep8
 NUM_PROCS = -1
@@ -79,14 +78,14 @@ def load_twitter_csv():
     pairings = {}
     path = './TwitterOutput/'
     for file_name in [file for file in os.listdir(path) if file.endswith('.csv')]:  # nopep8
-        print(file_name)
+        logging.info(file_name)
         with open(path + file_name, mode='r', encoding='utf-8-sig') as csv_file:  # nopep8
             for line in csv.DictReader(csv_file):
                 line = convert_dict(line)
                 try:
                     entities = ast.literal_eval(line['entities'])
                 except(Exception):
-                    print("Missing entities for twitter.csv", line['url'])
+                    # print("Missing entities for twitter.csv", line['url'])
                     entities = {}
 
                 try:
@@ -1064,7 +1063,7 @@ if __name__ == '__main__':
     scope_timer = timer()
     # load scopes
     crawl_scope = load_scope('./crawl_scope.csv')
-    citation_scope = load_scope('./citaion_scope.csv')
+    citation_scope = load_scope('./citation_scope.csv')
 
     scope_timer_end = timer()
 
