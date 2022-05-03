@@ -135,12 +135,18 @@ def load_scope(file):
     with open(file) as csv_file:
         for line in csv.DictReader(csv_file):
             aliases, twitter, tags = [], [], []
-            if line['Text Aliases'] != " " and line['Text Aliases']:
+            if 'Text Aliases' in line.keys() and line['Text Aliases']:
                 aliases = line['Text Aliases'].split('|')
-            if line['Associated Twitter Handle'] != " " and line['Associated Twitter Handle']:  # nopep8
+            else:
+                aliases = []
+            if 'Associated Twitter Handle' in line.keys() and line['Associated Twitter Handle']:  # nopep8
                 twitter = line['Associated Twitter Handle'].split('|')
-            if line['Tags'] != " " and line['Tags']:
+            else:
+                twitter = []
+            if 'Tags' in line.keys() and line['Tags']:
                 tags = line['Tags'].split('|')
+            else:
+                tags = []
             try:
                 publisher = line['Associated Publisher']
             except(Exception):
@@ -150,14 +156,14 @@ def load_scope(file):
             except(Exception):
                 source = str(uuid.uuid5(
                     uuid.NAMESPACE_DNS, line['Name']))
-            scope[source] = {'Name': line['Name'],
+            scope[source] = {'Name': line['Name'] if 'Name' in line.keys() else '',
                                     #  'RSS': line['RSS feed URLs (where available)'],  # nopep8
-                                     'Type': line['Type'],
+                                     'Type': line['Type'] if 'type' in line.keys() else '',
                                      'Publisher': publisher,
                                      'Tags': tags,
                                      'aliases': aliases,
                                      'twitter_handles': twitter}
-    write_to_file(scope, "scope.json")
+    write_to_file(scope, "scope_" + file + ".json")
     return scope
 
 
@@ -181,26 +187,34 @@ def find_domain_citation_aliases(data, node, scope):
 
     sequence = data[node]['html_content']
     for source, info in scope.items():
-        # find the in-scope citation url in html_content
-        ext = tldextract.extract(source)
-        if ext[0] == '':
-            domain = ext[1] + '.' + ext[2]
-        else:
-            domain = '.'.join(ext)
-        pattern = r"<a\s+href=([\"'])(http://www.|http://|https://www.|https://)" + \
-            re.escape(domain) + r"/(.*?)([\"'])(.*?)(>)(.*?)(</a>)"
-        matches = re.findall(pattern, sequence, re.IGNORECASE)
-        if matches:
-            for match in matches:
-                citation_url = match[1] + domain + '/' + match[2]
-                # sometime non english article list hyperlink multiple times for a single citation
-                # check duplicate here
-                if not (citation_url in citation_url_or_text_alias):
-                    citation_url_or_text_alias.append(citation_url)
-                    anchor_text.append(match[6])
-                    citation_name.append(info["Name"])
-                if not (source in found_aliases):
-                    found_aliases.append(source)
+
+        if 'http' in source:
+            # find the in-scope citation url in html_content
+            ext_node = tldextract.extract(data[node]['domain'])
+            ext = tldextract.extract(source)
+
+            # skip recursive citation
+            if (ext_node == ext):
+                continue
+
+            if ext[0] == '':
+                domain = ext[1] + '.' + ext[2]
+            else:
+                domain = '.'.join(ext)
+            pattern = r"<a\s+href=([\"'])(http://www.|http://|https://www.|https://)" + \
+                re.escape(domain) + r"/(.*?)([\"'])(.*?)(>)(.*?)(</a>)"
+            matches = re.findall(pattern, sequence, re.IGNORECASE)
+            if matches:
+                for match in matches:
+                    citation_url = match[1] + domain + '/' + match[2]
+                    # sometime non english article list hyperlink multiple times for a single citation
+                    # check duplicate here
+                    if citation_url not in citation_url_or_text_alias:
+                        citation_url_or_text_alias.append(citation_url)
+                        anchor_text.append(match[6])
+                        citation_name.append(info["Name"])
+                    if source not in found_aliases:
+                        found_aliases.append(source)
 
         # find in-scope aliases in html_content
         if info['aliases']:
@@ -210,7 +224,7 @@ def find_domain_citation_aliases(data, node, scope):
                 if re.search(pattern, sequence, re.IGNORECASE):
                     citation_url_or_text_alias.append(aliases[i])
                     citation_name.append(info["Name"])
-                    if not (source in found_aliases):
+                    if source not in found_aliases:
                         found_aliases.append(source)
 
         # find twitter_handles in html_content
@@ -221,7 +235,7 @@ def find_domain_citation_aliases(data, node, scope):
                 if re.search(pattern, sequence, re.IGNORECASE):
                     citation_url_or_text_alias.append(handles[i])
                     citation_name.append(info['Name'])
-                    if not (source in found_aliases):
+                    if source not in found_aliases:
                         found_aliases.append(source)
 
         data[node]['citation url or text alias'] = citation_url_or_text_alias
@@ -240,7 +254,13 @@ def find_twitter_citation_aliases(data, node, scope):
 
         # find all url with domain matching scope
         if 'http' in source:
+
+            ext_node = tldextract.extract(data[node]['domain'])
             ext = tldextract.extract(source)
+
+            # skip recursive citation
+            if (ext_node == ext):
+                continue
             if ext[0] == '':
                 domain = ext[1] + '.' + ext[2] + '/'
             else:
@@ -250,17 +270,17 @@ def find_twitter_citation_aliases(data, node, scope):
                 if domain in url:
                     citation_url_or_text_alias.append(url)
                     citation_name.append(info['Name'])
-                    if not (source in found_aliases):
+                    if source not in found_aliases:
                         found_aliases.append(source)
 
         for url in data[node]['found_urls']:
             for twitter_handle in info['twitter_handles']:
                 twitter_url = 'https://twitter.com/' + \
                     twitter_handle.replace('@', '') + '/'
-                if twitter_url in url and not (url in citation_url_or_text_alias):
+                if twitter_url in url and (url not in citation_url_or_text_alias):
                     citation_url_or_text_alias.append(url)
                     citation_name.append(info['Name'])
-                    if not (source in found_aliases):
+                    if source not in found_aliases:
                         found_aliases.append(source)
 
         # find all matching mentions of the tweet
@@ -269,17 +289,17 @@ def find_twitter_citation_aliases(data, node, scope):
                 if twitter_handle.replace('@', '').lower() == mention.lower():
                     citation_url_or_text_alias.append(twitter_handle)
                     citation_name.append(info['Name'])
-                    if not (source in found_aliases):
+                    if source not in found_aliases:
                         found_aliases.append(source)
 
         # find all matching text aliases of the tweet text
         aliases = info['aliases']
         for i in range(0, len(aliases)):
             pattern = r"( |\"|')" + re.escape(aliases[i]) + r"( |\"|'|,)"
-            if re.search(pattern, data[node]['article_text'], re.IGNORECASE) and not (aliases[i] in citation_url_or_text_alias):
+            if re.search(pattern, data[node]['article_text'], re.IGNORECASE) and (aliases[i] not in citation_url_or_text_alias):
                 citation_url_or_text_alias.append(aliases[i])
                 citation_name.append(info["Name"])
-                if not (source in found_aliases):
+                if source not in found_aliases:
                     found_aliases.append(source)
 
     data[node]['citation url or text alias'] = citation_url_or_text_alias
