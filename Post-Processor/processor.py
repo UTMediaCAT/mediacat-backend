@@ -162,7 +162,8 @@ def load_scope(file):
                                      'Tags': tags,
                                      'aliases': aliases,
                                      'twitter_handles': twitter}
-    write_to_file(scope, "scope_" + file + ".json")
+    write_to_file(scope, "processed_" + file.replace('./',
+                  '').replace('.csv', '') + ".json")
     return scope
 
 
