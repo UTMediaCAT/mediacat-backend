@@ -250,17 +250,20 @@ def find_twitter_citation_aliases(data, node, scope):
     citation_url_or_text_alias = []
     citation_name = []
 
+    node_twitter_handle = data[node]['domain']
+
     for source, info in scope.items():
+
+        # skip recursive citation
+
+        for i in range(0, len(info['twitter_handles'])):
+            if (info['twitter_handles'][i].replace('@', '').strip().lower() == node_twitter_handle.replace('@', '').strip().lower()):
+                continue
 
         # find all url with domain matching scope
         if 'http' in source:
-
-            ext_node = tldextract.extract(data[node]['domain'])
             ext = tldextract.extract(source)
 
-            # skip recursive citation
-            if (ext_node == ext):
-                continue
             if ext[0] == '':
                 domain = ext[1] + '.' + ext[2] + '/'
             else:
